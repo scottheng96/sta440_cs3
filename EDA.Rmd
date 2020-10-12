@@ -5,6 +5,7 @@ output: pdf_document
 
 ```{r packages}
 library(tidyverse)
+library(foreign)
 ```
 
 ```{r load-data}
@@ -16,6 +17,11 @@ president_approval_polls <- read.csv("data/president_approval_polls.csv")
 president_polls <- read.csv("data/president_polls.csv")
 presidential_poll_averages_2020 <- read.csv("data/presidential_poll_averages_2020.csv")
 senate_polls <- read.csv("data/senate_polls.csv")
+
+economist_polls <- read.csv("data/2016_Economist_Polls.csv")
+state_update <- read.dta("data/state_level_update.dta")
+gay_marriage <- read.dta("data/gay_marriage_megapoll.dta")
+
 ```
 
 
