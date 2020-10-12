@@ -15,27 +15,28 @@ house_polls <- read.csv("data/house_polls.csv")
 pres_primary_avgs_2020 <- read.csv("data/pres_primary_avgs_2020.csv")
 president_approval_polls <- read.csv("data/president_approval_polls.csv")
 president_polls <- read.csv("data/president_polls.csv")
-presidential_poll_averages_2020 <- read.csv("data/presidential_poll_averages_2020.csv")
+presidential_poll_averages_2020 <- read.csv("data/presidential_poll_averages_2020.csv") # note Maine and Nebraska are counted several times due to split electoral votes in this dataset
 senate_polls <- read.csv("data/senate_polls.csv")
 
 economist_polls <- read.csv("data/2016_Economist_Polls.csv")
 state_update <- read.dta("data/state_level_update.dta")
 gay_marriage <- read.dta("data/gay_marriage_megapoll.dta")
 
+cces <- readRDS("data/cumulative_2006-2019.Rds")
 ```
 
 
-```{r}
+```{r approval-ratings}
 president_approval_polls %>%
-  ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = yes)) + geom_point() + geom_smooth()
+  ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = yes)) + geom_point(aes(size = sample_size, alpha = 0.3))+ geom_smooth(color = "red")
 
 ```
 
 
 ```{r}
-# note Maine and Nebraska are counted several times due to split electoral votes
+
 presidential_poll_averages_2020 %>%
-  filter(state == "National") %>% ggplot(aes(x = as.Date(modeldate, format = "%m/%d/%y"), y = pct_estimate, color = candidate_name)) + geom_point()
+  filter(state == "National") %>% ggplot(aes(x = as.Date(modeldate, format = "%m/%d/%y"), y = pct_estimate, color = candidate_name)) + geom_line() + labs(title = "National Polls") + scale_colour_manual(values = c("Joseph R. Biden Jr." = "#123adb", "Donald Trump" = "#E01414", "Convention Bounce for Donald Trump" = "#ffb2ab","Convention Bounce for Joseph R. Biden Jr." =  "#abd1ff"))
 
 presidential_poll_averages_2020 %>%
   filter(state != "National") %>% 
@@ -43,7 +44,13 @@ presidential_poll_averages_2020 %>%
   filter(state != "ME-2") %>%
   filter(state != "NE-1") %>%
   filter(state != "NE-2") %>%
-  ggplot(aes(x = as.Date(modeldate, format = "%m/%d/%y"), y = pct_estimate, color = candidate_name)) + geom_line() + facet_wrap(~state)
+  filter(candidate_name == "Donald Trump" | candidate_name == "Joseph R. Biden Jr.") %>%
+  ggplot(aes(x = as.Date(modeldate, format = "%m/%d/%y"), y = pct_estimate, color = candidate_name)) + geom_line() + facet_wrap(~state) + labs(title = "Polls by state") + scale_colour_manual(values = c("Joseph R. Biden Jr." = "#123adb", "Donald Trump" = "#E01414"))
+
+presidential_poll_averages_2020 %>%
+  filter(state == "Florida" | state == "Pennsylvania" | state == "Ohio" | state == "Michigan" | state == "North Carolina" | state == "Arizona" | state == "Wisconsin" |  state == "Iowa") %>%
+  filter(candidate_name == "Donald Trump" | candidate_name == "Joseph R. Biden Jr.") %>%
+  ggplot(aes(x = as.Date(modeldate, format = "%m/%d/%y"), y = pct_estimate, color = candidate_name)) + geom_line() + facet_wrap(~state) + labs(title = "Polls by Swing State") + scale_colour_manual(values = c("Joseph R. Biden Jr." = "#123adb", "Donald Trump" = "#E01414"))
 
 ```
 
@@ -51,7 +58,12 @@ presidential_poll_averages_2020 %>%
 ```{r}
 senate_polls %>%
   filter(candidate_party == "DEM" | candidate_party == "REP") %>%
-  ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = pct, color = candidate_party)) + geom_point() + facet_wrap(~race_id)
+  ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = pct, color = candidate_party)) + geom_point() + facet_wrap(~race_id)+ labs(title = "Polls by senate races") + scale_colour_manual(values = c("DEM" = "#123adb", "REP" = "#E01414"))
+
+senate_polls %>%
+  filter(candidate_party == "DEM" | candidate_party == "REP") %>%
+  filter(state == "Minnesota" | state == "Michigan" | state == "Arizona" | state == "Colorado" | state == "North Carolina" | state == "Maine" | state == "Iowa" | state == "Montana" | state == "Georgia" | state == "Kansas" | state == "South Carolina" | state == "Alabama" |state == "Alaska" |state == "Texas") %>%
+  ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = pct, color = candidate_party)) + geom_line() + facet_wrap(~race_id) + labs(title = "Polls by closer senate races") + scale_colour_manual(values = c("DEM" = "#123adb", "REP" = "#E01414"))
 ```
 
 
@@ -61,18 +73,17 @@ NC_house <- house_polls %>%
   filter(candidate_party == "REP" | candidate_party == "DEM")
 
 NC_house %>%
-  ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = pct, color = as.factor(candidate_party))) + geom_point() + facet_wrap(~seat_name)
+  ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = pct, color = as.factor(candidate_party))) + geom_point() + facet_wrap(~seat_name) + scale_colour_manual(values = c("DEM" = "#123adb", "REP" = "#E01414"))
 
-glimpse(NC_house)
 ```
 
 ```{r}
 NC_senate <- senate_polls %>%
   filter(state == "North Carolina") %>%
-  filter(candidate_party == "REP" | candidate_party == "DEM")
+  filter(candidate_party == "DEM" | candidate_party == "REP")
 
 NC_senate %>%
-  ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = pct, color = as.factor(candidate_party))) + geom_point()
+  ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = pct, color = as.factor(candidate_party))) + geom_point() + scale_colour_manual(values = c("DEM" = "#123adb", "REP" = "#E01414"))
 ```
 
 
