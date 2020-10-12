@@ -1,0 +1,73 @@
+---
+title: "EDA"
+output: pdf_document
+---
+
+```{r packages}
+library(tidyverse)
+```
+
+```{r load-data}
+generic_ballot_polls <- read.csv("data/generic_ballot_polls.csv")
+governor_polls <- read.csv("data/governor_polls.csv")
+house_polls <- read.csv("data/house_polls.csv")
+pres_primary_avgs_2020 <- read.csv("data/pres_primary_avgs_2020.csv")
+president_approval_polls <- read.csv("data/president_approval_polls.csv")
+president_polls <- read.csv("data/president_polls.csv")
+presidential_poll_averages_2020 <- read.csv("data/presidential_poll_averages_2020.csv")
+senate_polls <- read.csv("data/senate_polls.csv")
+```
+
+
+```{r}
+president_approval_polls %>%
+  ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = yes)) + geom_point() + geom_smooth()
+
+```
+
+
+```{r}
+# note Maine and Nebraska are counted several times due to split electoral votes
+presidential_poll_averages_2020 %>%
+  filter(state == "National") %>% ggplot(aes(x = as.Date(modeldate, format = "%m/%d/%y"), y = pct_estimate, color = candidate_name)) + geom_point()
+
+presidential_poll_averages_2020 %>%
+  filter(state != "National") %>% 
+  filter(state != "ME-1") %>%
+  filter(state != "ME-2") %>%
+  filter(state != "NE-1") %>%
+  filter(state != "NE-2") %>%
+  ggplot(aes(x = as.Date(modeldate, format = "%m/%d/%y"), y = pct_estimate, color = candidate_name)) + geom_line() + facet_wrap(~state)
+
+```
+
+
+```{r}
+senate_polls %>%
+  filter(candidate_party == "DEM" | candidate_party == "REP") %>%
+  ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = pct, color = candidate_party)) + geom_point() + facet_wrap(~race_id)
+```
+
+
+```{r}
+NC_house <- house_polls %>%
+  filter(state == "North Carolina") %>%
+  filter(candidate_party == "REP" | candidate_party == "DEM")
+
+NC_house %>%
+  ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = pct, color = as.factor(candidate_party))) + geom_point() + facet_wrap(~seat_name)
+
+glimpse(NC_house)
+```
+
+```{r}
+NC_senate <- senate_polls %>%
+  filter(state == "North Carolina") %>%
+  filter(candidate_party == "REP" | candidate_party == "DEM")
+
+NC_senate %>%
+  ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = pct, color = as.factor(candidate_party))) + geom_point()
+```
+
+
+
