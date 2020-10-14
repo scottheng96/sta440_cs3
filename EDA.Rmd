@@ -23,6 +23,16 @@ state_update <- read.dta("data/state_level_update.dta")
 gay_marriage <- read.dta("data/gay_marriage_megapoll.dta")
 
 cces <- readRDS("data/cumulative_2006-2019.Rds")
+
+census <- read.csv("data/cc-est2019-alldata-37.csv")
+
+gay_marriage <- read.dta("data/gay_marriage_megapoll.dta")
+
+parent_income <- read.csv("data/mrc_table12.csv")
+outcomes <- read.csv("data/tract_outcomes_early.csv")
+
+neighborhood_census <- read.csv("data/tract_covariates.csv")
+neighborhood_county <- read.csv("data/cty_covariates.csv")
 ```
 
 
