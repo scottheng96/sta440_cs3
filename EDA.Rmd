@@ -43,8 +43,7 @@ president_approval_polls %>%
 ```
 
 
-```{r}
-
+```{r presidential-polls-by-state}
 presidential_poll_averages_2020 %>%
   filter(state == "National") %>% ggplot(aes(x = as.Date(modeldate, format = "%m/%d/%y"), y = pct_estimate, color = candidate_name)) + geom_line() + labs(title = "National Polls") + scale_colour_manual(values = c("Joseph R. Biden Jr." = "#123adb", "Donald Trump" = "#E01414", "Convention Bounce for Donald Trump" = "#ffb2ab","Convention Bounce for Joseph R. Biden Jr." =  "#abd1ff"))
 
@@ -65,7 +64,7 @@ presidential_poll_averages_2020 %>%
 ```
 
 
-```{r}
+```{r senate-race-polls}
 senate_polls %>%
   filter(candidate_party == "DEM" | candidate_party == "REP") %>%
   ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = pct, color = candidate_party)) + geom_point() + facet_wrap(~race_id)+ labs(title = "Polls by senate races") + scale_colour_manual(values = c("DEM" = "#123adb", "REP" = "#E01414"))
@@ -77,7 +76,7 @@ senate_polls %>%
 ```
 
 
-```{r}
+```{r nc-house-races}
 NC_house <- house_polls %>%
   filter(state == "North Carolina") %>%
   filter(candidate_party == "REP" | candidate_party == "DEM")
@@ -87,7 +86,7 @@ NC_house %>%
 
 ```
 
-```{r}
+```{r nc-senate-race}
 NC_senate <- senate_polls %>%
   filter(state == "North Carolina") %>%
   filter(candidate_party == "DEM" | candidate_party == "REP")
