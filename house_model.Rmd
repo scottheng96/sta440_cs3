@@ -1,0 +1,76 @@
+---
+title: "House Model"
+author: "Matty Pahren"
+date: "10/15/2020"
+output: pdf_document
+---
+
+```{r}
+library(tidyverse)
+
+house_data <- read.csv(file='data/house_polls.csv')
+nc_house <- house_data %>%
+  filter(state == "North Carolina") %>%
+  filter(candidate_party == "REP" | candidate_party == "DEM")
+county_data <- read.csv(file = 'data/cty_covariates.csv') %>%
+  filter(state == 37)
+nc_counties <- read.csv(file = 'data/nc_county_data.csv')
+nc_2016_data <- read.csv(file = 'data/2016_NC_data.csv') %>%
+  mutate(county = X)
+  
+full_counties <- full_join(county_data, nc_counties, by = "county")
+full_counties <- full_join(full_counties, nc_2016_data, by = "county") 
+
+```
+
+```{r census-EDA}
+hist(full_counties$Trump.percentage)
+hist(full_counties$frac_coll_plus2010)
+hist(full_counties$poor_share2010)
+hist(full_counties$rent_twobed2015)
+hist(full_counties$ann_avg_job_growth_2004_2013)
+hist(full_counties$share_white2010)
+hist(full_counties$share_black2010)
+hist(full_counties$share_hisp2010)
+hist(full_counties$share_asian2010)
+```
+
+
+```{r multi-level-model}
+library(lme4)
+library(merTools)
+
+# linear mixed model with random effect for county
+M2 <- lmer(Trump.percentage ~ frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = full_counties, control = lmerControl(optimizer ="Nelder_Mead"))
+summary(M2)
+coef(M2)
+
+```
+
+
+```{r}
+PI <- predictInterval(merMod = M2, newdata = full_counties,
+                        level = 0.95, n.sims = 1000,
+                        stat = "median", type="linear.prediction",
+                        include.resid.var = TRUE)
+
+# account for counties split into 2 districts
+modified_counties <- full_counties %>%
+  mutate(Totals = as.numeric(gsub(",","",Totals))) %>%
+  mutate(voters = case_when(split == "y" ~ Totals/2,
+                            TRUE ~ Totals))
+
+modified_counties$fit = PI$fit
+modified_counties$lower = PI$lwr
+modified_counties$upper = PI$upr
+
+# weight county vote share by number of people who voted in 2016 election
+modified_counties %>%
+  group_by(district) %>%
+  summarise(dist_share_rep = sum(fit*voters)/sum(voters),
+            dist_lwr_rep = sum(lower*voters)/sum(voters),
+            dist_upr_rep = sum(upper*voters)/sum(voters))
+
+
+```
+
