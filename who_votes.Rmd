@@ -1,0 +1,22 @@
+---
+title: "Who Votes?"
+date: "10/20/2020"
+output: pdf_document
+---
+
+# Introduction
+
+# Literature Review
+
+# Data
+
+## NC Voter Data
+
+## NC Census Data
+
+# Model
+
+
+# Citations
+
+# Appendix
