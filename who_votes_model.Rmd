@@ -91,6 +91,17 @@ census2018 <- filter(census, year == 2018)
 census <- rbind(census2016, census2018)
 ```
 
+```{r}
+ethnicity <- read.csv("ethnicity.csv")
+ethnicity <- ethnicity %>%
+  select(-c(fips, region, cog, msa))
+ethnicity <- ethnicity %>%
+  select(c(county, hisp, race, sex, tot2016, tot2018))
+ethnicity <- filter(ethnicity, hisp != "Total")
+ethnicity <- filter(ethnicity, race != "Total")
+ethnicity <- filter(ethnicity, sex != "Total")
+```
+
 
 
 
