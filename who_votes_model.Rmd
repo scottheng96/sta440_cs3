@@ -80,30 +80,8 @@ voters_history %>% ggplot(aes(x = gender_code)) + geom_bar()
 voters_history_condensed <- voters_history %>% group_by(race_code, gender_code, ethnic_code, election_lbl, voted_county_id) %>% summarise(n = n())
 ```
 
-```{r}
-census <- read.csv("ncprojections.csv")
-census <- census %>%
-  select(-c(age3to4, age0to2, age5, age6to9, age10to13, age14, age15, age100, age85to99, age75to84, age65to74, age60to64, age55to59, age45to54, age35to44, age25to34, age20to24, age18to19, age16to17))
-census <- census[complete.cases(census),]
-census <- filter(census, sex != 'Total')
-census2016 <- filter(census, year == 2016)
-census2018 <- filter(census, year == 2018)
-census <- rbind(census2016, census2018)
-```
-
-```{r}
-ethnicity <- read.csv("/Users/ashleymurray/Downloads/ethnicity.csv")
-ethnicity <- ethnicity %>%
-  select(-c(fips, region, cog, msa))
-ethnicity <- ethnicity %>%
-  select(c(county, hisp, race, sex, tot2016, tot2018))
-ethnicity <- filter(ethnicity, hisp != "Total")
-ethnicity <- filter(ethnicity, race != "Total")
-ethnicity <- filter(ethnicity, sex != "Total")
-```
-
-```{r}
-alldata <- read.csv("alldata.csv")
+```{r warnings = FALSE}
+alldata <- read.csv("data/alldata.csv")
 alldata <- alldata %>%
   filter(AGEGRP %in% c(4,5,6,7,8, 9,10,11,12,13,14,15,16,17,18))
 alldata <- alldata %>%
@@ -225,8 +203,24 @@ final_census <- rbind(first, second, third, fourth)
 
 final_census <- final_census %>%
   select(-c(variable)) %>%
-  mutate(age_group = case_when(age_group == 1 ~ '18-24', age_group == 2 ~ '25-44', age_group == 3 ~ '45-64', TRUE ~ 'over 65'))
+  mutate(age_group = case_when(age_group == 1 ~ '18-24', age_group == 2 ~ '25-44', age_group == 3 ~ '45-64', TRUE ~ 'over 65')) %>%
+  mutate(county_desc = gsub(" County", "", CTYNAME)) %>%
+  mutate(ethnic_code = ethnicity) %>%
+  mutate(race_code = race) %>% 
+  mutate(election_lbl = case_when(YEAR == 2016 ~ as.Date('11/8/2016', format = "%m/%d/%Y"), YEAR == 2018 ~ as.Date('11/6/2018', format = "%m/%d/%Y"))) %>%
+  mutate(n_exists= value)
+
+final_census <- final_census %>%
+  select(c(age_group, n_exists, gender_code, ethnic_code, county_desc, election_lbl, race_code))
 ```
+
+#combine with modeling_data
+```{r}
+voters_history_condensed <- voters_history_condensed %>%
+  mutate(election_lbl = as.Date(election_lbl, format = "%m/%d/%Y")) %>%
+  mutate(county_desc = tolower(county_desc))
+```
+
 
 
 
