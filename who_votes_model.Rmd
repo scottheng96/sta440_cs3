@@ -103,7 +103,7 @@ ethnicity <- filter(ethnicity, sex != "Total")
 ```
 
 ```{r}
-alldata <- read.csv("/Users/ashleymurray/Downloads/alldata.csv")
+alldata <- read.csv("alldata.csv")
 alldata <- alldata %>%
   filter(AGEGRP %in% c(4,5,6,7,8, 9,10,11,12,13,14,15,16,17,18))
 alldata <- alldata %>%
