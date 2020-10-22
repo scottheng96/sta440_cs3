@@ -8,6 +8,11 @@ output: pdf_document
 
 # Literature Review
 
+Previous studies have examined different ways of estimating who votes, but there does not appear to be any general consensus in the best way of modeling this. In one study (Wislek), the author attempts to predict voter turnout rates based on an area's violent crime rate, number of US House Representatives, and several other political factors. However, this data is examined at the state level, so there might be differences across counties that aren't being captured. 
+Another paper by Challenor states the importance of likely voter models in election forecasting, and goes onto predict voter turnout based on US Census questions. They compared several models, the best of which had 87.82% accuracy, and determined that the features most correlated with voting included education level, marital status, and major job industry, while the variables with least correlated with voting were marital status based on armed forces participation, intermediate job industry, and age. 
+In Grofman's paper, "Models of voter turnout: a brief idiosyncratic review," he examines many old studies about voting models, and some date back to as early as 1957. He says that the two main schools of thought in voter prediction modeling are  predicting turnout in terms of demographic or attitudinal factors and the other is estimating voter turnout by thinking of voting as a "rational choice calculus" where citizens estimate the costs and benefits of voting. In the end, he determines that both methods produce similar results: it is very hard to explain which individuals will vote or not, but models have found more success in predicting which categories of people vote depending on group characteristics and the election.
+
+
 # Data
 
 ## NC Voter Data
@@ -16,7 +21,18 @@ output: pdf_document
 
 # Model
 
-
 # Citations
+
+
+
+Can Likely U.S. Voter Models Be Improved? (2020, May 30). Retrieved October 22, 2020, from https://www.pewresearch.org/methods/2016/01/07/comparing-the-results-of-different-likely-voter-models/
+
+Challenor, T. (2017, December 15). Predicting Votes From Census Data. Retrieved October 22, 2020, from http://cs229.stanford.edu/proj2017/final-reports/5232542.pdf
+
+Grofman, B. (1983). Models of Voter Turnout: A Brief Idiosyncratic Review: A Comment. Public Choice, 41(1), 55-61. doi:https://www.jstor.org/stable/30024032?seq=1#metadata_info_tab_contents
+
+Wislek, J. (n.d.). Predicting Voter Turnout. Retrieved October 22, 2020, from https://scholar.valpo.edu/cgi/viewcontent.cgi?article=1906&amp;context=cus
+
+
 
 # Appendix
