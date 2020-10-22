@@ -15,8 +15,8 @@ library(dplyr)
 
 # Preprocessing 
 ```{r load-data}
-voters <- readRDS("~/Desktop/CaseStudy3/data/ncvoter_Statewide_small.rds")
-his <- readRDS("~/Desktop/CaseStudy3/data/ncvhis_Statewide_small.rds")
+voters <- readRDS("./data/ncvoter_Statewide_small.rds")
+his <- readRDS("./data/ncvhis_Statewide_small.rds")
 ```
 
 ```{r}
@@ -30,3 +30,59 @@ voters_history <- merge(voters, his, by=c("voter_reg_num", "county_id")) #need t
 #do we need to create more entries for each of the voters because we just have the values of which they did vote. 
 #create a level in the "voting", for each election the voter could have voted in, but didn't
 ```
+
+```{r}
+# Code from slide Amy referenced
+adm1 <-
+  brm(data = d, family = binomial,
+      admit | trials(applications) ~ 1 + male ,
+      prior = c(prior(normal(0, 3), class = Intercept),
+                prior(normal(0, 1), class = b)),
+      iter = 2500, warmup = 500, cores = 2, chains = 2,
+      seed = 10)
+summary(adm1)
+```
+
+```{r}
+voters_history <- voters_history %>% mutate(
+  age_group = case_when(
+    birth_age  <= 24 ~ "18-24",
+    (birth_age > 24) & (birth_age <=44) ~ "25-44",
+    (birth_age > 44) & (birth_age <= 64) ~ "44-64",
+    birth_age >= 65 ~ "65+"
+  )
+)
+```
+
+
+```{r}
+library(ggplot2)
+voters_history %>% ggplot(aes(x = age_group)) + geom_bar()
+```
+
+```{r}
+library(ggplot2)
+voters_history %>% ggplot(aes(x = race_code)) + geom_bar()
+```
+
+```{r}
+library(ggplot2)
+voters_history %>% ggplot(aes(x = ethnic_code)) + geom_bar()
+```
+
+
+```{r}
+library(ggplot2)
+voters_history %>% ggplot(aes(x = gender_code)) + geom_bar()
+```
+
+```{r}
+voters_history_condensed <- voters_history %>% group_by(race_code, gender_code, ethnic_code, election_lbl, voted_county_id) %>% summarise(n = n())
+```
+
+
+
+
+
+
+
