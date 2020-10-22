@@ -82,10 +82,13 @@ voters_history_condensed <- voters_history %>% group_by(race_code, gender_code, 
 
 ```{r}
 census <- read.csv("ncprojections.csv")
-census_condensed <- census %>%
-  select(year, race, county, sex, age0to17, age18to24, age25to34, age45to54, age65plus) %>%
-  group_by(year, race, county, sex) %>%
-  summarise()
+census <- census %>%
+  select(-c(age3to4, age0to2, age5, age6to9, age10to13, age14, age15, age100, age85to99, age75to84, age65to74, age60to64, age55to59, age45to54, age35to44, age25to34, age20to24, age18to19, age16to17))
+census <- census[complete.cases(census),]
+census <- filter(census, sex != 'Total')
+census2016 <- filter(census, year == 2016)
+census2018 <- filter(census, year == 2018)
+census <- rbind(census2016, census2018)
 ```
 
 
