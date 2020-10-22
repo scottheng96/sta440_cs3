@@ -92,7 +92,7 @@ census <- rbind(census2016, census2018)
 ```
 
 ```{r}
-ethnicity <- read.csv("ethnicity.csv")
+ethnicity <- read.csv("/Users/ashleymurray/Downloads/ethnicity.csv")
 ethnicity <- ethnicity %>%
   select(-c(fips, region, cog, msa))
 ethnicity <- ethnicity %>%
@@ -102,6 +102,131 @@ ethnicity <- filter(ethnicity, race != "Total")
 ethnicity <- filter(ethnicity, sex != "Total")
 ```
 
+```{r}
+alldata <- read.csv("/Users/ashleymurray/Downloads/alldata.csv")
+alldata <- alldata %>%
+  filter(AGEGRP %in% c(4,5,6,7,8, 9,10,11,12,13,14,15,16,17,18))
+alldata <- alldata %>%
+  mutate(TOT_POP = case_when(AGEGRP == 4 ~ TOT_POP/2, TRUE ~ as.double(TOT_POP)))
+alldata <- alldata[rep(row.names(alldata), ifelse(alldata$AGEGRP == 4,2,1)),]
+alldata[duplicated(alldata),]$AGEGRP <- "15-17"
+alldata <- alldata %>%
+  mutate(AGEGRP = case_when(
+    AGEGRP == 4 ~ '18-19',
+    AGEGRP == 5 ~ '20-24',
+    AGEGRP == 6 ~ '25-29',
+     AGEGRP == 7 ~ '30-34',
+     AGEGRP == 8 ~ '35-39',
+     AGEGRP == 9 ~ '40-44',
+     AGEGRP == 10 ~ '45-49',
+     AGEGRP == 11 ~ '50-54',
+     AGEGRP == 12 ~ '55-59',
+     AGEGRP == 13 ~ '60-64',
+     AGEGRP == 14 ~ '65-69',
+     AGEGRP == 15 ~ '70-74',
+     AGEGRP == 16 ~ '75-79',
+     AGEGRP == 17 ~ '80-84',
+     AGEGRP == 18 ~ 'over 85'
+  ))
+alldata$AGEGRP[is.na(alldata$AGEGRP)] <- '15-17'
+alldata <- filter(alldata, YEAR %in% c(9,11))
+alldata <- alldata %>%
+  mutate(YEAR = case_when(YEAR == 9 ~ 2016, YEAR == 11 ~ 2018))
+
+alldata <- alldata %>%
+  select(-c(SUMLEV, STATE, STNAME))
+first <- filter(alldata, AGEGRP %in% c('18-19', '20-24'))
+second <- filter(alldata, AGEGRP %in% c('25-29', '30-34', '35-39', '40-44'))
+third <- filter(alldata, AGEGRP %in% c('45-49', '50-54', '55-59', '60-64'))
+fourth <- filter(alldata, AGEGRP %in% c('65-69', '70-74', '75-79', '80-84', 'over 85'))
+
+first <- first %>%
+  group_by(CTYNAME, YEAR) %>%
+  summarise(TOT_POP = sum(TOT_POP, na.rm = TRUE), TOT_MALE = sum(TOT_MALE, na.rm = TRUE), 
+            TOT_FEMALE = sum(TOT_POP, na.rm = TRUE), WA_MALE = sum(WA_MALE, na.rm = TRUE), WA_FEMALE = sum(WA_FEMALE, na.rm = TRUE),  BA_MALE = sum(BA_MALE, na.rm = TRUE), BA_FEMALE = sum(BA_FEMALE, na.rm = TRUE),  IA_MALE = sum(IA_MALE, na.rm = TRUE), IA_FEMALE = sum(IA_FEMALE, na.rm = TRUE), AA_MALE = sum(AA_MALE, na.rm = TRUE), AA_FEMALE = sum(AA_FEMALE, na.rm = TRUE), NA_MALE = sum(AA_MALE, na.rm = TRUE), NA_FEMALE  = sum(NA_FEMALE, na.rm = TRUE),TOM_MALE = sum(TOM_MALE, na.rm = TRUE),  TOM_FEMALE   = sum(TOM_FEMALE, na.rm = TRUE),  WAC_MALE = sum(WAC_MALE, na.rm = TRUE), WAC_FEMALE  = sum(WAC_FEMALE, na.rm = TRUE),BAC_MALE= sum(BAC_MALE, na.rm = TRUE),BAC_FEMALE  = sum(BAC_FEMALE, na.rm = TRUE), IAC_MALE = sum(IAC_MALE, na.rm = TRUE), IAC_FEMALE = sum(IAC_FEMALE, na.rm = TRUE), AAC_MALE = sum(AAC_MALE, na.rm = TRUE), AAC_FEMALE = sum(AAC_FEMALE, na.rm = TRUE), NAC_MALE= sum(NAC_MALE, na.rm = TRUE), NAC_FEMALE = sum(NAC_FEMALE, na.rm = TRUE), NH_MALE = sum(NH_MALE, na.rm = TRUE), NH_FEMALE= sum(NH_FEMALE, na.rm = TRUE), NHWA_MALE= sum(NHWA_MALE, na.rm = TRUE),
+  NHWA_FEMALE = sum(NHWA_FEMALE, na.rm = TRUE), NHBA_MALE = sum(NHBA_MALE, na.rm = TRUE), NHBA_FEMALE = sum(NHBA_FEMALE, na.rm = TRUE), NHIA_MALE = sum(NHIA_MALE, na.rm = TRUE), NHIA_FEMALE = sum(NHIA_FEMALE, na.rm = TRUE), NHAA_MALE = sum(NHAA_MALE, na.rm = TRUE), 
+  NHAA_FEMALE = sum(NHIA_MALE, na.rm = TRUE), NHNA_MALE = sum(NHIA_MALE, na.rm = TRUE), NHNA_FEMALE = sum(NHNA_FEMALE, na.rm = TRUE),
+  NHTOM_MALE = sum(NHTOM_MALE, na.rm = TRUE), NHTOM_FEMALE   = sum(NHIA_MALE, na.rm = TRUE), NHWAC_MALE = sum(NHIA_MALE, na.rm = TRUE),
+  NHWAC_FEMALE = sum(NHWAC_FEMALE, na.rm = TRUE), NHBAC_MALE = sum(NHBAC_MALE, na.rm = TRUE), NHBAC_FEMALE = sum(NHBAC_FEMALE, na.rm = TRUE), NHIAC_MALE = sum(NHIAC_MALE, na.rm = TRUE),  NHIAC_FEMALE = sum(NHIAC_FEMALE, na.rm = TRUE), NHAAC_MALE  = sum(NHAAC_MALE, na.rm = TRUE), NHAAC_FEMALE = sum(NHAAC_FEMALE, na.rm = TRUE), NHNAC_MALE = sum(NHNAC_MALE, na.rm = TRUE), NHNAC_FEMALE = sum(NHNAC_FEMALE, na.rm = TRUE),  H_MALE = sum(H_MALE, na.rm = TRUE), H_FEMALE = sum(H_FEMALE, na.rm = TRUE), HWA_MALE = sum(HWA_MALE, na.rm = TRUE), HWA_FEMALE = sum(HWA_FEMALE, na.rm = TRUE), HBA_MALE = sum(HBA_MALE, na.rm = TRUE), HBA_FEMALE = sum(HBA_FEMALE, na.rm = TRUE),   HIA_MALE     = sum(HIA_MALE, na.rm = TRUE), HIA_FEMALE = sum(HIA_FEMALE, na.rm = TRUE), HAA_MALE  = sum(HAA_MALE, na.rm = TRUE), HAA_FEMALE = sum(HAA_FEMALE, na.rm = TRUE), HNA_MALE = sum(HNA_MALE, na.rm = TRUE), HNA_FEMALE = sum(HNA_FEMALE, na.rm = TRUE), HTOM_MALE  = sum(HTOM_MALE, na.rm = TRUE),HTOM_FEMALE = sum(HTOM_FEMALE, na.rm = TRUE), HWAC_MALE = sum(HWAC_MALE, na.rm = TRUE), HWAC_FEMALE = sum(HWAC_FEMALE, na.rm = TRUE), HBAC_MALE = sum(HBAC_MALE, na.rm = TRUE), HBAC_FEMALE = sum(HBAC_FEMALE, na.rm = TRUE), HIAC_MALE = sum(HIAC_MALE, na.rm = TRUE), HIAC_FEMALE = sum(HIAC_FEMALE, na.rm = TRUE), HAAC_MALE  = sum(HAAC_MALE, na.rm = TRUE), HAAC_FEMALE = sum(HAAC_FEMALE, na.rm = TRUE), HNAC_MALE = sum(HNAC_MALE, na.rm = TRUE), HNAC_FEMALE  = sum(HNAC_FEMALE, na.rm = TRUE))
+
+second <- second %>%
+    group_by(CTYNAME, YEAR) %>%
+  summarise(TOT_POP = sum(TOT_POP, na.rm = TRUE), TOT_MALE = sum(TOT_MALE, na.rm = TRUE), 
+            TOT_FEMALE = sum(TOT_POP, na.rm = TRUE), WA_MALE = sum(WA_MALE, na.rm = TRUE), WA_FEMALE = sum(WA_FEMALE, na.rm = TRUE),  BA_MALE = sum(BA_MALE, na.rm = TRUE), BA_FEMALE = sum(BA_FEMALE, na.rm = TRUE),  IA_MALE = sum(IA_MALE, na.rm = TRUE), IA_FEMALE = sum(IA_FEMALE, na.rm = TRUE), AA_MALE = sum(AA_MALE, na.rm = TRUE), AA_FEMALE = sum(AA_FEMALE, na.rm = TRUE), NA_MALE = sum(AA_MALE, na.rm = TRUE), NA_FEMALE  = sum(NA_FEMALE, na.rm = TRUE),TOM_MALE = sum(TOM_MALE, na.rm = TRUE),  TOM_FEMALE   = sum(TOM_FEMALE, na.rm = TRUE),  WAC_MALE = sum(WAC_MALE, na.rm = TRUE), WAC_FEMALE  = sum(WAC_FEMALE, na.rm = TRUE),BAC_MALE= sum(BAC_MALE, na.rm = TRUE),BAC_FEMALE  = sum(BAC_FEMALE, na.rm = TRUE), IAC_MALE = sum(IAC_MALE, na.rm = TRUE), IAC_FEMALE = sum(IAC_FEMALE, na.rm = TRUE), AAC_MALE = sum(AAC_MALE, na.rm = TRUE), AAC_FEMALE = sum(AAC_FEMALE, na.rm = TRUE), NAC_MALE= sum(NAC_MALE, na.rm = TRUE), NAC_FEMALE = sum(NAC_FEMALE, na.rm = TRUE), NH_MALE = sum(NH_MALE, na.rm = TRUE), NH_FEMALE= sum(NH_FEMALE, na.rm = TRUE), NHWA_MALE= sum(NHWA_MALE, na.rm = TRUE),
+  NHWA_FEMALE = sum(NHWA_FEMALE, na.rm = TRUE), NHBA_MALE = sum(NHBA_MALE, na.rm = TRUE), NHBA_FEMALE = sum(NHBA_FEMALE, na.rm = TRUE), NHIA_MALE = sum(NHIA_MALE, na.rm = TRUE), NHIA_FEMALE = sum(NHIA_FEMALE, na.rm = TRUE), NHAA_MALE = sum(NHAA_MALE, na.rm = TRUE), 
+  NHAA_FEMALE = sum(NHIA_MALE, na.rm = TRUE), NHNA_MALE = sum(NHIA_MALE, na.rm = TRUE), NHNA_FEMALE = sum(NHNA_FEMALE, na.rm = TRUE),
+  NHTOM_MALE = sum(NHTOM_MALE, na.rm = TRUE), NHTOM_FEMALE   = sum(NHIA_MALE, na.rm = TRUE), NHWAC_MALE = sum(NHIA_MALE, na.rm = TRUE),
+  NHWAC_FEMALE = sum(NHWAC_FEMALE, na.rm = TRUE), NHBAC_MALE = sum(NHBAC_MALE, na.rm = TRUE), NHBAC_FEMALE = sum(NHBAC_FEMALE, na.rm = TRUE), NHIAC_MALE = sum(NHIAC_MALE, na.rm = TRUE),  NHIAC_FEMALE = sum(NHIAC_FEMALE, na.rm = TRUE), NHAAC_MALE  = sum(NHAAC_MALE, na.rm = TRUE), NHAAC_FEMALE = sum(NHAAC_FEMALE, na.rm = TRUE), NHNAC_MALE = sum(NHNAC_MALE, na.rm = TRUE), NHNAC_FEMALE = sum(NHNAC_FEMALE, na.rm = TRUE),  H_MALE = sum(H_MALE, na.rm = TRUE), H_FEMALE = sum(H_FEMALE, na.rm = TRUE), HWA_MALE = sum(HWA_MALE, na.rm = TRUE), HWA_FEMALE = sum(HWA_FEMALE, na.rm = TRUE), HBA_MALE = sum(HBA_MALE, na.rm = TRUE), HBA_FEMALE = sum(HBA_FEMALE, na.rm = TRUE),   HIA_MALE     = sum(HIA_MALE, na.rm = TRUE), HIA_FEMALE = sum(HIA_FEMALE, na.rm = TRUE), HAA_MALE  = sum(HAA_MALE, na.rm = TRUE), HAA_FEMALE = sum(HAA_FEMALE, na.rm = TRUE), HNA_MALE = sum(HNA_MALE, na.rm = TRUE), HNA_FEMALE = sum(HNA_FEMALE, na.rm = TRUE), HTOM_MALE  = sum(HTOM_MALE, na.rm = TRUE),HTOM_FEMALE = sum(HTOM_FEMALE, na.rm = TRUE), HWAC_MALE = sum(HWAC_MALE, na.rm = TRUE), HWAC_FEMALE = sum(HWAC_FEMALE, na.rm = TRUE), HBAC_MALE = sum(HBAC_MALE, na.rm = TRUE), HBAC_FEMALE = sum(HBAC_FEMALE, na.rm = TRUE), HIAC_MALE = sum(HIAC_MALE, na.rm = TRUE), HIAC_FEMALE = sum(HIAC_FEMALE, na.rm = TRUE), HAAC_MALE  = sum(HAAC_MALE, na.rm = TRUE), HAAC_FEMALE = sum(HAAC_FEMALE, na.rm = TRUE), HNAC_MALE = sum(HNAC_MALE, na.rm = TRUE), HNAC_FEMALE  = sum(HNAC_FEMALE, na.rm = TRUE))
+
+third <- third %>%
+    group_by(CTYNAME, YEAR) %>%
+  summarise(TOT_POP = sum(TOT_POP, na.rm = TRUE), TOT_MALE = sum(TOT_MALE, na.rm = TRUE), 
+            TOT_FEMALE = sum(TOT_POP, na.rm = TRUE), WA_MALE = sum(WA_MALE, na.rm = TRUE), WA_FEMALE = sum(WA_FEMALE, na.rm = TRUE),  BA_MALE = sum(BA_MALE, na.rm = TRUE), BA_FEMALE = sum(BA_FEMALE, na.rm = TRUE),  IA_MALE = sum(IA_MALE, na.rm = TRUE), IA_FEMALE = sum(IA_FEMALE, na.rm = TRUE), AA_MALE = sum(AA_MALE, na.rm = TRUE), AA_FEMALE = sum(AA_FEMALE, na.rm = TRUE), NA_MALE = sum(AA_MALE, na.rm = TRUE), NA_FEMALE  = sum(NA_FEMALE, na.rm = TRUE),TOM_MALE = sum(TOM_MALE, na.rm = TRUE),  TOM_FEMALE   = sum(TOM_FEMALE, na.rm = TRUE),  WAC_MALE = sum(WAC_MALE, na.rm = TRUE), WAC_FEMALE  = sum(WAC_FEMALE, na.rm = TRUE),BAC_MALE= sum(BAC_MALE, na.rm = TRUE),BAC_FEMALE  = sum(BAC_FEMALE, na.rm = TRUE), IAC_MALE = sum(IAC_MALE, na.rm = TRUE), IAC_FEMALE = sum(IAC_FEMALE, na.rm = TRUE), AAC_MALE = sum(AAC_MALE, na.rm = TRUE), AAC_FEMALE = sum(AAC_FEMALE, na.rm = TRUE), NAC_MALE= sum(NAC_MALE, na.rm = TRUE), NAC_FEMALE = sum(NAC_FEMALE, na.rm = TRUE), NH_MALE = sum(NH_MALE, na.rm = TRUE), NH_FEMALE= sum(NH_FEMALE, na.rm = TRUE), NHWA_MALE= sum(NHWA_MALE, na.rm = TRUE),
+  NHWA_FEMALE = sum(NHWA_FEMALE, na.rm = TRUE), NHBA_MALE = sum(NHBA_MALE, na.rm = TRUE), NHBA_FEMALE = sum(NHBA_FEMALE, na.rm = TRUE), NHIA_MALE = sum(NHIA_MALE, na.rm = TRUE), NHIA_FEMALE = sum(NHIA_FEMALE, na.rm = TRUE), NHAA_MALE = sum(NHAA_MALE, na.rm = TRUE), 
+  NHAA_FEMALE = sum(NHIA_MALE, na.rm = TRUE), NHNA_MALE = sum(NHIA_MALE, na.rm = TRUE), NHNA_FEMALE = sum(NHNA_FEMALE, na.rm = TRUE),
+  NHTOM_MALE = sum(NHTOM_MALE, na.rm = TRUE), NHTOM_FEMALE   = sum(NHIA_MALE, na.rm = TRUE), NHWAC_MALE = sum(NHIA_MALE, na.rm = TRUE),
+  NHWAC_FEMALE = sum(NHWAC_FEMALE, na.rm = TRUE), NHBAC_MALE = sum(NHBAC_MALE, na.rm = TRUE), NHBAC_FEMALE = sum(NHBAC_FEMALE, na.rm = TRUE), NHIAC_MALE = sum(NHIAC_MALE, na.rm = TRUE),  NHIAC_FEMALE = sum(NHIAC_FEMALE, na.rm = TRUE), NHAAC_MALE  = sum(NHAAC_MALE, na.rm = TRUE), NHAAC_FEMALE = sum(NHAAC_FEMALE, na.rm = TRUE), NHNAC_MALE = sum(NHNAC_MALE, na.rm = TRUE), NHNAC_FEMALE = sum(NHNAC_FEMALE, na.rm = TRUE),  H_MALE = sum(H_MALE, na.rm = TRUE), H_FEMALE = sum(H_FEMALE, na.rm = TRUE), HWA_MALE = sum(HWA_MALE, na.rm = TRUE), HWA_FEMALE = sum(HWA_FEMALE, na.rm = TRUE), HBA_MALE = sum(HBA_MALE, na.rm = TRUE), HBA_FEMALE = sum(HBA_FEMALE, na.rm = TRUE),   HIA_MALE     = sum(HIA_MALE, na.rm = TRUE), HIA_FEMALE = sum(HIA_FEMALE, na.rm = TRUE), HAA_MALE  = sum(HAA_MALE, na.rm = TRUE), HAA_FEMALE = sum(HAA_FEMALE, na.rm = TRUE), HNA_MALE = sum(HNA_MALE, na.rm = TRUE), HNA_FEMALE = sum(HNA_FEMALE, na.rm = TRUE), HTOM_MALE  = sum(HTOM_MALE, na.rm = TRUE),HTOM_FEMALE = sum(HTOM_FEMALE, na.rm = TRUE), HWAC_MALE = sum(HWAC_MALE, na.rm = TRUE), HWAC_FEMALE = sum(HWAC_FEMALE, na.rm = TRUE), HBAC_MALE = sum(HBAC_MALE, na.rm = TRUE), HBAC_FEMALE = sum(HBAC_FEMALE, na.rm = TRUE), HIAC_MALE = sum(HIAC_MALE, na.rm = TRUE), HIAC_FEMALE = sum(HIAC_FEMALE, na.rm = TRUE), HAAC_MALE  = sum(HAAC_MALE, na.rm = TRUE), HAAC_FEMALE = sum(HAAC_FEMALE, na.rm = TRUE), HNAC_MALE = sum(HNAC_MALE, na.rm = TRUE), HNAC_FEMALE  = sum(HNAC_FEMALE, na.rm = TRUE))
+
+fourth <- fourth %>%
+    group_by(CTYNAME, YEAR) %>%
+  summarise(TOT_POP = sum(TOT_POP, na.rm = TRUE), TOT_MALE = sum(TOT_MALE, na.rm = TRUE), 
+            TOT_FEMALE = sum(TOT_POP, na.rm = TRUE), WA_MALE = sum(WA_MALE, na.rm = TRUE), WA_FEMALE = sum(WA_FEMALE, na.rm = TRUE),  BA_MALE = sum(BA_MALE, na.rm = TRUE), BA_FEMALE = sum(BA_FEMALE, na.rm = TRUE),  IA_MALE = sum(IA_MALE, na.rm = TRUE), IA_FEMALE = sum(IA_FEMALE, na.rm = TRUE), AA_MALE = sum(AA_MALE, na.rm = TRUE), AA_FEMALE = sum(AA_FEMALE, na.rm = TRUE), NA_MALE = sum(AA_MALE, na.rm = TRUE), NA_FEMALE  = sum(NA_FEMALE, na.rm = TRUE),TOM_MALE = sum(TOM_MALE, na.rm = TRUE),  TOM_FEMALE   = sum(TOM_FEMALE, na.rm = TRUE),  WAC_MALE = sum(WAC_MALE, na.rm = TRUE), WAC_FEMALE  = sum(WAC_FEMALE, na.rm = TRUE),BAC_MALE= sum(BAC_MALE, na.rm = TRUE),BAC_FEMALE  = sum(BAC_FEMALE, na.rm = TRUE), IAC_MALE = sum(IAC_MALE, na.rm = TRUE), IAC_FEMALE = sum(IAC_FEMALE, na.rm = TRUE), AAC_MALE = sum(AAC_MALE, na.rm = TRUE), AAC_FEMALE = sum(AAC_FEMALE, na.rm = TRUE), NAC_MALE= sum(NAC_MALE, na.rm = TRUE), NAC_FEMALE = sum(NAC_FEMALE, na.rm = TRUE), NH_MALE = sum(NH_MALE, na.rm = TRUE), NH_FEMALE= sum(NH_FEMALE, na.rm = TRUE), NHWA_MALE= sum(NHWA_MALE, na.rm = TRUE),
+  NHWA_FEMALE = sum(NHWA_FEMALE, na.rm = TRUE), NHBA_MALE = sum(NHBA_MALE, na.rm = TRUE), NHBA_FEMALE = sum(NHBA_FEMALE, na.rm = TRUE), NHIA_MALE = sum(NHIA_MALE, na.rm = TRUE), NHIA_FEMALE = sum(NHIA_FEMALE, na.rm = TRUE), NHAA_MALE = sum(NHAA_MALE, na.rm = TRUE), 
+  NHAA_FEMALE = sum(NHIA_MALE, na.rm = TRUE), NHNA_MALE = sum(NHIA_MALE, na.rm = TRUE), NHNA_FEMALE = sum(NHNA_FEMALE, na.rm = TRUE),
+  NHTOM_MALE = sum(NHTOM_MALE, na.rm = TRUE), NHTOM_FEMALE   = sum(NHIA_MALE, na.rm = TRUE), NHWAC_MALE = sum(NHIA_MALE, na.rm = TRUE),
+  NHWAC_FEMALE = sum(NHWAC_FEMALE, na.rm = TRUE), NHBAC_MALE = sum(NHBAC_MALE, na.rm = TRUE), NHBAC_FEMALE = sum(NHBAC_FEMALE, na.rm = TRUE), NHIAC_MALE = sum(NHIAC_MALE, na.rm = TRUE),  NHIAC_FEMALE = sum(NHIAC_FEMALE, na.rm = TRUE), NHAAC_MALE  = sum(NHAAC_MALE, na.rm = TRUE), NHAAC_FEMALE = sum(NHAAC_FEMALE, na.rm = TRUE), NHNAC_MALE = sum(NHNAC_MALE, na.rm = TRUE), NHNAC_FEMALE = sum(NHNAC_FEMALE, na.rm = TRUE),  H_MALE = sum(H_MALE, na.rm = TRUE), H_FEMALE = sum(H_FEMALE, na.rm = TRUE), HWA_MALE = sum(HWA_MALE, na.rm = TRUE), HWA_FEMALE = sum(HWA_FEMALE, na.rm = TRUE), HBA_MALE = sum(HBA_MALE, na.rm = TRUE), HBA_FEMALE = sum(HBA_FEMALE, na.rm = TRUE),   HIA_MALE     = sum(HIA_MALE, na.rm = TRUE), HIA_FEMALE = sum(HIA_FEMALE, na.rm = TRUE), HAA_MALE  = sum(HAA_MALE, na.rm = TRUE), HAA_FEMALE = sum(HAA_FEMALE, na.rm = TRUE), HNA_MALE = sum(HNA_MALE, na.rm = TRUE), HNA_FEMALE = sum(HNA_FEMALE, na.rm = TRUE), HTOM_MALE  = sum(HTOM_MALE, na.rm = TRUE),HTOM_FEMALE = sum(HTOM_FEMALE, na.rm = TRUE), HWAC_MALE = sum(HWAC_MALE, na.rm = TRUE), HWAC_FEMALE = sum(HWAC_FEMALE, na.rm = TRUE), HBAC_MALE = sum(HBAC_MALE, na.rm = TRUE), HBAC_FEMALE = sum(HBAC_FEMALE, na.rm = TRUE), HIAC_MALE = sum(HIAC_MALE, na.rm = TRUE), HIAC_FEMALE = sum(HIAC_FEMALE, na.rm = TRUE), HAAC_MALE  = sum(HAAC_MALE, na.rm = TRUE), HAAC_FEMALE = sum(HAAC_FEMALE, na.rm = TRUE), HNAC_MALE = sum(HNAC_MALE, na.rm = TRUE), HNAC_FEMALE  = sum(HNAC_FEMALE, na.rm = TRUE))
+
+first$age_group <- seq(1, 1, 200)
+first <- first %>%
+  select(-c(TOT_FEMALE, TOT_MALE, TOT_POP))
+second$age_group <- seq(2, 2, 200)
+second <- second %>%
+  select(-c(TOT_FEMALE, TOT_MALE, TOT_POP))
+third$age_group <- seq(3, 3, 200)
+third <- third %>%
+  select(-c(TOT_FEMALE, TOT_MALE, TOT_POP))
+fourth$age_group <- seq(4, 4, 200)
+fourth <- fourth %>%
+  select(-c(TOT_FEMALE, TOT_MALE, TOT_POP))
+library(data.table)
+melt_first <- melt(first, id.vars=c("CTYNAME", "YEAR", "age_group"))
+melt_second <- melt(second, id.vars=c("CTYNAME", "YEAR", "age_group"))
+melt_third <- melt(third, id.vars=c("CTYNAME", "YEAR", "age_group"))
+melt_fourth <- melt(fourth, id.vars=c("CTYNAME", "YEAR", "age_group"))
+
+first <- melt_first %>%
+  mutate(gender_code = case_when(substring(as.character(variable), 4) == 'MALE' ~ 'M', TRUE ~ 'F')) %>%
+  mutate(ethnicity = case_when(as.character(variable) %in% c("HIA_MALE", "HIA_FEMALE", "HAA_MALE", "HAA_FEMALE", "HNA_MALE", "HNA_FEMALE", "HTOM_MALE", "HTOM_FEMALE", "HWAC_MALE", "HWAC_FEMALE", "HBAC_MALE", "HBAC_FEMALE", "HIAC_MALE", "HIAC_FEMALE", "HAAC_MALE", "HAAC_FEMALE", "HNAC_MALE", "HNAC_FEMALE") ~ 'HL', TRUE ~ 'NL')) 
+first <- filter(first, as.character(variable) %in% c("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE", "AA_FEMALE", "NA_MALE", "NA_FEMALER", "TOM_MALE", "TOM_FEMALE", "NHWA_MALE", "NHWA_FEMALE", "NHIA_MALE", "NHIA_FEMALE", "NHBA_MALE", "NHBA_FEMALE", "NHAA_MALE", "NHAA_FEMALE", "NHNA_MALE", "NHANA_FEMALE", "NHTOM_MALE", "NHTOM_FEMALE", "HWA_MALE", "HWA_FEMALE", "HBA_MALE", "HBA_FEMALE", "HIA_MALE", "HIA_FEMALE", "HAA_MALE", "HAA_FEMALE", "HNA_MALE", "HNA_FEMALE", "HTOM_MALE", "HTOM_FEMALE")) %>%
+  mutate(race = case_when(as.character(variable) %in% c("WA_MALE", "WA_FEMALE", "NHWA_MALE", "NHWA_FEMALE", "HWA_FEMALE", "HWA_MALE") ~ 'W', as.character(variable) %in% c("BA_MALE", "BA_FEMALE", "NHBA_MALE", "NHBA_FEMALE", "HBA_FEMALE", "HBA_MALE") ~ 'B', as.character(variable) %in% c("IA_MALE", "IA_FEMALE", "NHIA_MALE", "NHIA_FEMALE", "HIA_MALE", "HIA_FEMALE") ~ 'I', as.character(variable) %in% c("TOM_FEMALE", "TOM_MALE", "NHTOM_MALE", "NHTOM_FEMALE", "HTOM_MALE", "HTOM_FEMALE") ~ 'M', as.character(variable) %in% c("NA_MALE", "NA_FEMALE", "NHNA_FEMALE", "NHNA_MALE", "HNA_FEMALE", "HNA_MALE") ~ 'P', as.character(variable) %in% c("AA_MALE", "AA_FEMALE", "NHAA_MALE", "NHAA_FEMALE", "HAA_FEMALE", "HAA_MALE") ~ 'A', TRUE ~ 'O'))
+
+
+second <- melt_second %>%
+  mutate(gender_code = case_when(substring(as.character(variable), 4) == 'MALE' ~ 'M', TRUE ~ 'F')) %>%
+  mutate(ethnicity = case_when(as.character(variable) %in% c("HIA_MALE", "HIA_FEMALE", "HAA_MALE", "HAA_FEMALE", "HNA_MALE", "HNA_FEMALE", "HTOM_MALE", "HTOM_FEMALE", "HWAC_MALE", "HWAC_FEMALE", "HBAC_MALE", "HBAC_FEMALE", "HIAC_MALE", "HIAC_FEMALE", "HAAC_MALE", "HAAC_FEMALE", "HNAC_MALE", "HNAC_FEMALE") ~ 'HL', TRUE ~ 'NL')) 
+second <- filter(second, as.character(variable) %in% c("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE", "AA_FEMALE", "NA_MALE", "NA_FEMALER", "TOM_MALE", "TOM_FEMALE", "NHWA_MALE", "NHWA_FEMALE", "NHIA_MALE", "NHIA_FEMALE", "NHBA_MALE", "NHBA_FEMALE", "NHAA_MALE", "NHAA_FEMALE", "NHNA_MALE", "NHANA_FEMALE", "NHTOM_MALE", "NHTOM_FEMALE", "HWA_MALE", "HWA_FEMALE", "HBA_MALE", "HBA_FEMALE", "HIA_MALE", "HIA_FEMALE", "HAA_MALE", "HAA_FEMALE", "HNA_MALE", "HNA_FEMALE", "HTOM_MALE", "HTOM_FEMALE"))%>%
+  mutate(race = case_when(as.character(variable) %in% c("WA_MALE", "WA_FEMALE", "NHWA_MALE", "NHWA_FEMALE", "HWA_FEMALE", "HWA_MALE") ~ 'W', as.character(variable) %in% c("BA_MALE", "BA_FEMALE", "NHBA_MALE", "NHBA_FEMALE", "HBA_FEMALE", "HBA_MALE") ~ 'B', as.character(variable) %in% c("IA_MALE", "IA_FEMALE", "NHIA_MALE", "NHIA_FEMALE", "HIA_MALE", "HIA_FEMALE") ~ 'I', as.character(variable) %in% c("TOM_FEMALE", "TOM_MALE", "NHTOM_MALE", "NHTOM_FEMALE", "HTOM_MALE", "HTOM_FEMALE") ~ 'M', as.character(variable) %in% c("NA_MALE", "NA_FEMALE", "NHNA_FEMALE", "NHNA_MALE", "HNA_FEMALE", "HNA_MALE") ~ 'P', as.character(variable) %in% c("AA_MALE", "AA_FEMALE", "NHAA_MALE", "NHAA_FEMALE", "HAA_FEMALE", "HAA_MALE") ~ 'A', TRUE ~ 'O'))
+
+third <- melt_third %>%
+  mutate(gender_code = case_when(substring(as.character(variable), 4) == 'MALE' ~ 'M', TRUE ~ 'F')) %>%
+  mutate(ethnicity = case_when(as.character(variable) %in% c("HIA_MALE", "HIA_FEMALE", "HAA_MALE", "HAA_FEMALE", "HNA_MALE", "HNA_FEMALE", "HTOM_MALE", "HTOM_FEMALE", "HWAC_MALE", "HWAC_FEMALE", "HBAC_MALE", "HBAC_FEMALE", "HIAC_MALE", "HIAC_FEMALE", "HAAC_MALE", "HAAC_FEMALE", "HNAC_MALE", "HNAC_FEMALE") ~ 'HL', TRUE ~ 'NL')) 
+
+third <- filter(third, as.character(variable) %in% c("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE", "AA_FEMALE", "NA_MALE", "NA_FEMALER", "TOM_MALE", "TOM_FEMALE", "NHWA_MALE", "NHWA_FEMALE", "NHIA_MALE", "NHIA_FEMALE", "NHBA_MALE", "NHBA_FEMALE", "NHAA_MALE", "NHAA_FEMALE", "NHNA_MALE", "NHANA_FEMALE", "NHTOM_MALE", "NHTOM_FEMALE", "HWA_MALE", "HWA_FEMALE", "HBA_MALE", "HBA_FEMALE", "HIA_MALE", "HIA_FEMALE", "HAA_MALE", "HAA_FEMALE", "HNA_MALE", "HNA_FEMALE", "HTOM_MALE", "HTOM_FEMALE")) %>%
+  mutate(race = case_when(as.character(variable) %in% c("WA_MALE", "WA_FEMALE", "NHWA_MALE", "NHWA_FEMALE", "HWA_FEMALE", "HWA_MALE") ~ 'W', as.character(variable) %in% c("BA_MALE", "BA_FEMALE", "NHBA_MALE", "NHBA_FEMALE", "HBA_FEMALE", "HBA_MALE") ~ 'B', as.character(variable) %in% c("IA_MALE", "IA_FEMALE", "NHIA_MALE", "NHIA_FEMALE", "HIA_MALE", "HIA_FEMALE") ~ 'I', as.character(variable) %in% c("TOM_FEMALE", "TOM_MALE", "NHTOM_MALE", "NHTOM_FEMALE", "HTOM_MALE", "HTOM_FEMALE") ~ 'M', as.character(variable) %in% c("NA_MALE", "NA_FEMALE", "NHNA_FEMALE", "NHNA_MALE", "HNA_FEMALE", "HNA_MALE") ~ 'P', as.character(variable) %in% c("AA_MALE", "AA_FEMALE", "NHAA_MALE", "NHAA_FEMALE", "HAA_FEMALE", "HAA_MALE") ~ 'A', TRUE ~ 'O'))
+  
+
+fourth <- melt_fourth %>%
+  mutate(gender_code = case_when(substring(as.character(variable), 4) == 'MALE' ~ 'M', TRUE ~ 'F')) %>%
+  mutate(ethnicity = case_when(as.character(variable) %in% c("HIA_MALE", "HIA_FEMALE", "HAA_MALE", "HAA_FEMALE", "HNA_MALE", "HNA_FEMALE", "HTOM_MALE", "HTOM_FEMALE", "HWAC_MALE", "HWAC_FEMALE", "HBAC_MALE", "HBAC_FEMALE", "HIAC_MALE", "HIAC_FEMALE", "HAAC_MALE", "HAAC_FEMALE", "HNAC_MALE", "HNAC_FEMALE") ~ 'HL', TRUE ~ 'NL'))
+fourth <- filter(fourth, as.character(variable) %in% c("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE", "AA_FEMALE", "NA_MALE", "NA_FEMALER", "TOM_MALE", "TOM_FEMALE", "NHWA_MALE", "NHWA_FEMALE", "NHIA_MALE", "NHIA_FEMALE", "NHBA_MALE", "NHBA_FEMALE", "NHAA_MALE", "NHAA_FEMALE", "NHNA_MALE", "NHANA_FEMALE", "NHTOM_MALE", "NHTOM_FEMALE", "HWA_MALE", "HWA_FEMALE", "HBA_MALE", "HBA_FEMALE", "HIA_MALE", "HIA_FEMALE", "HAA_MALE", "HAA_FEMALE", "HNA_MALE", "HNA_FEMALE", "HTOM_MALE", "HTOM_FEMALE")) %>%
+  mutate(race = case_when(as.character(variable) %in% c("WA_MALE", "WA_FEMALE", "NHWA_MALE", "NHWA_FEMALE", "HWA_FEMALE", "HWA_MALE") ~ 'W', as.character(variable) %in% c("BA_MALE", "BA_FEMALE", "NHBA_MALE", "NHBA_FEMALE", "HBA_FEMALE", "HBA_MALE") ~ 'B', as.character(variable) %in% c("IA_MALE", "IA_FEMALE", "NHIA_MALE", "NHIA_FEMALE", "HIA_MALE", "HIA_FEMALE") ~ 'I', as.character(variable) %in% c("TOM_FEMALE", "TOM_MALE", "NHTOM_MALE", "NHTOM_FEMALE", "HTOM_MALE", "HTOM_FEMALE") ~ 'M', as.character(variable) %in% c("NA_MALE", "NA_FEMALE", "NHNA_FEMALE", "NHNA_MALE", "HNA_FEMALE", "HNA_MALE") ~ 'P', as.character(variable) %in% c("AA_MALE", "AA_FEMALE", "NHAA_MALE", "NHAA_FEMALE", "HAA_FEMALE", "HAA_MALE") ~ 'A', TRUE ~ 'O'))
+
+final_census <- rbind(first, second, third, fourth)
+
+final_census <- final_census %>%
+  select(-c(variable)) %>%
+  mutate(age_group = case_when(age_group == 1 ~ '18-24', age_group == 2 ~ '25-44', age_group == 3 ~ '45-64', TRUE ~ 'over 65'))
+```
 
 
 
