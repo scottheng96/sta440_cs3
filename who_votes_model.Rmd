@@ -80,6 +80,14 @@ voters_history %>% ggplot(aes(x = gender_code)) + geom_bar()
 voters_history_condensed <- voters_history %>% group_by(race_code, gender_code, ethnic_code, election_lbl, voted_county_id) %>% summarise(n = n())
 ```
 
+```{r}
+census <- read.csv("ncprojections.csv")
+census_condensed <- census %>%
+  select(year, race, county, sex, age0to17, age18to24, age25to34, age45to54, age65plus) %>%
+  group_by(year, race, county, sex) %>%
+  summarise()
+```
+
 
 
 
