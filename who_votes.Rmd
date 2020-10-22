@@ -6,6 +6,10 @@ output: pdf_document
 
 # Introduction
 
+Election forecasting is of great interest to many people. Politicians might use it to adjust campaign strategies, economists might use it to predict how markets will react, and citizens might use it to decide whether to vote. Many polls are carried out in an attempt to predict the winner of an election, however these polls often don't capture the whole picture. Polls can be biased, they can change over time, and perhaps most importantly, they don't always reveal who will show up to vote on election day. In order to have a more accurate election prediction model, voter turnout is a critical factor to consider. For example, if one candidate is predicted to win by a large margin in the polls, that might cause some people not to show up to vote on election day. Additionally, some polls include people who might not actually be registered to vote.
+
+In this report, we seek to build a comprehensive model predicting who votes, specifically in the state of North Carolina. First, we will cover a brief literature review of other voter turnout models that have been constructed in the past. Next, we will discuss the data used to build our models. After that, we will walk through the construction of our model, and we will discuss our results.
+
 # Literature Review
 
 Previous studies have examined different ways of estimating who votes, but there does not appear to be any general consensus in the best way of modeling this. In one study (Wislek), the author attempts to predict voter turnout rates based on an area's violent crime rate, number of US House Representatives, and several other political factors. However, this data is examined at the state level, so there might be differences across counties that aren't being captured. 
@@ -20,6 +24,8 @@ In Grofman's paper, "Models of voter turnout: a brief idiosyncratic review," he 
 ## NC Census Data
 
 # Model
+
+# Results
 
 # Citations
 
