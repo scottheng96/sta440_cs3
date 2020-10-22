@@ -1,0 +1,199 @@
+---
+title: "who_votes"
+author: "Ashley Murray"
+date: "10/21/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r packages, warnings=FALSE}
+library(dplyr)
+```
+
+# Preprocessing 
+```{r load-data}
+voters <- readRDS("./data/ncvoter_Statewide_small.rds")
+his <- readRDS("./data/ncvhis_Statewide_small.rds")
+```
+
+```{r}
+voters$voter_reg_num <- as.character(voters$voter_reg_num)
+voters$voter_reg_num <- as.integer(voters$voter_reg_num)
+voters_history <- merge(voters, his, by=c("voter_reg_num", "county_id")) #need to fix this line, dunno what happening
+```
+
+# Model
+```{r}
+#do we need to create more entries for each of the voters because we just have the values of which they did vote. 
+#create a level in the "voting", for each election the voter could have voted in, but didn't
+```
+
+```{r}
+# Code from slide Amy referenced
+adm1 <-
+  brm(data = d, family = binomial,
+      admit | trials(applications) ~ 1 + male ,
+      prior = c(prior(normal(0, 3), class = Intercept),
+                prior(normal(0, 1), class = b)),
+      iter = 2500, warmup = 500, cores = 2, chains = 2,
+      seed = 10)
+summary(adm1)
+```
+
+```{r}
+# Create age group variable w/ census categories
+voters_history <- voters_history %>% mutate(
+  age_group = case_when(
+    birth_age  <= 24 ~ "18-24",
+    (birth_age > 24) & (birth_age <=44) ~ "25-44",
+    (birth_age > 44) & (birth_age <= 64) ~ "44-64",
+    birth_age >= 65 ~ "65+"
+  )
+)
+```
+
+
+```{r}
+# Group by and find # voting
+voters_history_condensed <- voters_history %>% group_by(race_code, gender_code, ethnic_code, age_group, election_lbl, county_desc.x) %>% summarise(n = n())
+```
+
+```{r}
+# Get number of registered voters
+# How to deal with age group at election??
+# New rows for each election and recalculate their age?
+# rbind will join two DFs vertically
+# can make new columns for each election; recalculate age group for each of those elections
+# may crash your comp but then when it's done you can condense it and garbage collect the orig df
+voters_expanded = voters
+voters_expanded$election_lbl = unique(voters_history$election_lbl)[1]
+for (election in unique(voters_history$election_lbl)[2:length(unique(voters_history$election_lbl))]){
+  temp = voters
+  temp$election_lbl = election
+  voters_expanded = rbind(voters_expanded, temp)
+}
+```
+
+```{r}
+voters_expanded <- voters_expanded %>% mutate(
+  year_at_election = as.numeric(format(as.Date(election_lbl, "%m/%d/%Y"), "%Y"))
+)
+```
+
+```{r}
+voters_expanded <- voters_expanded %>% mutate(
+  age_at_election = year_at_election - birth_year
+)
+```
+
+```{r}
+# Create age group variable w/ census categories
+voters_expanded <- voters_expanded %>% mutate(
+  age_group = case_when(
+    age_at_election  <= 24 ~ "18-24",
+    (age_at_election > 24) & (age_at_election <=44) ~ "25-44",
+    (age_at_election > 44) & (age_at_election <= 64) ~ "44-64",
+    age_at_election >= 65 ~ "65+"
+  )
+)
+```
+
+```{r}
+# Create totals of voters registered 
+registered_voters <- voters_expanded %>% group_by(race_code, gender_code, ethnic_code, election_lbl, age_group, county_desc) %>% summarise(n_registered = n())
+```
+
+```{r}
+voters_history_condensed <- voters_history_condensed %>% rename(county_desc = county_desc.x)
+```
+
+```{r}
+modeling_data <- inner_join(voters_history_condensed, registered_voters, by = c("race_code", "gender_code", "ethnic_code","age_group", "election_lbl", "county_desc"))
+```
+
+```{r}
+#library(brms)
+# Creating a model
+adm1 <-
+  brm(data = modeling_data, family = binomial,
+      n | trials(n_registered) ~ 1 + race_code + gender_code + ethnic_code + election_lbl + age_group + (1|county_desc),
+      prior = c(prior(normal(0, 1), class = Intercept),
+                prior(normal(0, 1), class = b),
+                prior(normal(0, 1), class = sd)),
+      iter = 2500, warmup = 500, cores = 2, chains = 2,
+      seed = 10)
+summary(adm1)
+```
+
+```{r}
+# Looking at cases where more people voted than "were registered..."
+# Seems to be that a lot of people voted who then were not included in the updated voter registry... because they died.
+broken <- modeling_data %>% filter(
+  n_registered < n
+)
+```
+
+
+```{r}
+adm1 <-
+  brm(data = modeling_data, family = binomial,
+      n | trials(n_registered) ~ 1 + race_code + gender_code + ethnic_code + election_lbl + (1|county_desc))
+      #prior = c(prior(normal(0, 3), class = Intercept),
+      #          prior(normal(0, 1), class = b),
+      #          prior(normal(0, 1), class = b),
+      #          prior(normal(0, 1), class = b),
+      #          prior(normal(0, 1), class = b),
+      #          prior(normal(0, 3), class = Intercept)),
+      #iter = 2500, warmup = 500, cores = 2, chains = 2,
+      #seed = 10)
+summary(adm1)
+```
+
+
+
+
+
+```{r}
+census <- read.csv("ncprojections.csv")
+census <- census %>%
+  select(-c(age3to4, age0to2, age5, age6to9, age10to13, age14, age15, age100, age85to99, age75to84, age65to74, age60to64, age55to59, age45to54, age35to44, age25to34, age20to24, age18to19, age16to17))
+census <- census[complete.cases(census),]
+census <- filter(census, sex != 'Total')
+census2016 <- filter(census, year == 2016)
+census2018 <- filter(census, year == 2018)
+census <- rbind(census2016, census2018)
+census <- census %>% select(-c(fips, region, cog, msa, total, medage))
+```
+
+```{r}
+library(tidyr)
+census_pivot <- census %>% rename("18-24" = age18to24, "25-44" = age25to44, "45-64" = age45to64, "65+" = age65plus) %>%
+  pivot_longer(cols = c("18-24", "25-44", "45-64", "65+"), names_to = "age_group", values_to = "n_census") %>% select(-c("age0to17"))
+```
+
+```{r}
+# Make census_pivot mergeable with the condensed voter history dataframe
+census_pivot <- census_pivot %>% mutate(
+  county_desc.x = toupper(county),
+  race_code = case_when(
+    race == "aian" ~ "I",
+    race == "asian" ~ "A",
+    race == "black" ~ "B",
+    race == "white" ~ "W",
+    race == "other" ~ "O"
+  ),
+  gender_code = case_when(
+    sex == "male" ~ "M",
+    sex == "female" ~ "F"
+  )
+)
+```
+
+
+
+
+
+
