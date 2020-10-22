@@ -20,7 +20,9 @@ his <- readRDS("~/Desktop/CaseStudy3/data/ncvhis_Statewide_small.rds")
 ```
 
 ```{r}
-voters_history <- merge(voters, his, by=c("voter_reg_num", "county_desc")) #need to fix this line, dunno what happening
+voters$voter_reg_num <- as.character(voters$voter_reg_num)
+voters$voter_reg_num <- as.integer(voters$voter_reg_num)
+voters_history <- merge(voters, his, by=c("voter_reg_num", "county_id")) #need to fix this line, dunno what happening
 ```
 
 # Model
