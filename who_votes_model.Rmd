@@ -1,0 +1,30 @@
+---
+title: "who_votes"
+author: "Ashley Murray"
+date: "10/21/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r packages, warnings=FALSE}
+library(dplyr)
+```
+
+# Preprocessing 
+```{r load-data}
+voters <- readRDS("~/Desktop/CaseStudy3/data/ncvoter_Statewide_small.rds")
+his <- readRDS("~/Desktop/CaseStudy3/data/ncvhis_Statewide_small.rds")
+```
+
+```{r}
+voters_history <- merge(voters, his, by=c("voter_reg_num", "county_desc")) #need to fix this line, dunno what happening
+```
+
+# Model
+```{r}
+#do we need to create more entries for each of the voters because we just have the values of which they did vote. 
+#create a level in the "voting", for each election the voter could have voted in, but didn't
+```
