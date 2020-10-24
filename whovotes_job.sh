@@ -6,4 +6,4 @@
 #SBATCH --mem=10G                                                               
 
 module load R/4.0.0
-Rscript het.R
+Rscript working_model.R
