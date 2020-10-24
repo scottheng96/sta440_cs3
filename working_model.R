@@ -1,4 +1,3 @@
-install.packages("brms")
 library(brms)
 library(dplyr)
 library(tidyr)

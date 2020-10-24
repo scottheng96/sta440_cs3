@@ -5,5 +5,5 @@
 #SBATCH -c1                                                                     
 #SBATCH --mem=10G                                                               
 
-module load R/4.0.0
+module load RStan/2.19.2
 Rscript working_model.R
