@@ -50,11 +50,22 @@ voters_expanded <- voters_expanded %>% mutate(
 registered_voters <- voters_expanded %>% group_by(race_code, gender_code, ethnic_code, election_lbl, age_group, county_desc) %>% summarise(n_registered = n())
 voters_history_condensed <- voters_history_condensed %>% rename(county_desc = county_desc.x)
 modeling_data <- inner_join(voters_history_condensed, registered_voters, by = c("race_code", "gender_code", "ethnic_code","age_group", "election_lbl", "county_desc"))
+# Consolidating unknown values
+modeling_data <- modeling_data %>% mutate(
+  gender_code = case_when(
+    as.character(gender_code) == " " ~ "U",
+    as.character(gender_code) != " " ~ as.character(gender_code)
+  ),
+  race_code = case_when(
+    as.character(race_code) == " " ~ "U",
+    as.character(race_code) != " " ~ as.character(race_code)
+  )
+)
 # Releveling catrgorical variables
 modeling_data$race_code = relevel(as.factor(modeling_data$race_code), "W")
 modeling_data$ethnic_code = relevel(as.factor(modeling_data$ethnic_code), "NL")
 modeling_data$gender_code = relevel(as.factor(modeling_data$gender_code), "F")
-modeling_data$age_group = relevel(as.factor(modeling_data$age_group), "18-24")
+modeling_data$age_group = relevel(as.factor(modeling_data$age_group), "18-24)"
 
 # Creating a model
 adm1 <-
