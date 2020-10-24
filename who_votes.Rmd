@@ -19,17 +19,13 @@ In Grofman's paper, "Models of voter turnout: a brief idiosyncratic review," he 
 
 # Data
 
-## NC Voter Data
-
-## NC Census Data
+Several data sources were used to build the model. To start, we used information from the North Carolina voter registration database. The first dataset from this source was a file containing all registered voters in North Carolina. Each row represents an individual, and we also have their current voter status, the county they live in, the day they registered to vote, what political party they're a member of, as well as other demographic information like race, ethnicity, gender, and age. The second dataset from this source contained actual voting records from the 2016 and 2018 elections. Each row represents a vote, and includes other information like county, voter registration number, election, voting method, which party was voted for, and the precinct. 
 
 # Model
 
 # Results
 
 # Citations
-
-
 
 Can Likely U.S. Voter Models Be Improved? (2020, May 30). Retrieved October 22, 2020, from https://www.pewresearch.org/methods/2016/01/07/comparing-the-results-of-different-likely-voter-models/
 
