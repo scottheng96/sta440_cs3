@@ -48,7 +48,7 @@ voters_history <- voters_history %>% mutate(
   age_group = case_when(
     birth_age  <= 24 ~ "18-24",
     (birth_age > 24) & (birth_age <=44) ~ "25-44",
-    (birth_age > 44) & (birth_age <= 64) ~ "44-64",
+    (birth_age > 44) & (birth_age <= 64) ~ "45-64",
     birth_age >= 65 ~ "65+"
   )
 )
