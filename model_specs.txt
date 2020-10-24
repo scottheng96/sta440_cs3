@@ -1,0 +1,25 @@
+brm( # of ppl who voted in grp | trials(# eligible in group) ~ race + ethnicity + 
+							gender + county + 
+							(1|county)
+- datapoints are elections
+- we test that it works on the small data and then we move to the big data
+
+all data -->
+	elections -->
+		race, gender
+
+race   gender  election  number voting  total #   county
+
+ W       F       2016     90k            200k     orange
+
+N_{VOTE,race,gender,age group} | trials ~ 
+  race + gender + age group + (1|county) + year???/election?? + interactions??
+
+data %>% group_by(race, gender, age group, county, year) %>% summarise(count)
+
+1. age groups
+2. groupby thing
+
+Predictors to add?
+- indicator for whether election is presidential or midterm
+
