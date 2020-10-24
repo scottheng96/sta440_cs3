@@ -22,7 +22,8 @@ voters_history <- voters_history %>% mutate(
     age_at_election >= 65 ~ "65+"
   )
 )
-voters_history_condensed <- voters_history %>% group_by(race_code, gender_code, ethnic_code, age_group, county_desc.x, election_lbl) %>% summarise(n = n())
+voters_history_condensed <- voters_history %>% 
+  group_by(race_code, gender_code, ethnic_code, age_group, county_desc.x, election_lbl) %>% summarise(n = n())
 voters_expanded = voters
 voters_expanded$election_lbl = unique(voters_history$election_lbl)[1]
 for (election in unique(voters_history$election_lbl)[2:length(unique(voters_history$election_lbl))]){
@@ -52,10 +53,13 @@ modeling_data <- inner_join(voters_history_condensed, registered_voters, by = c(
 # Creating a model
 adm1 <-
   brm(data = modeling_data, family = binomial,
-      n | trials(n_registered) ~ 1 + race_code + gender_code + ethnic_code + election_lbl + age_group + (1|county_desc),
+      n | trials(n_registered) ~ 1 + race_code + gender_code + ethnic_code + election_lbl + age_group + (1|county_desc) 
+      + race_code * gender_code + race_code * ethnic_code + race_code * election_lbl + race_code * age_group +
+        gender_code * ethnic_code + gender_code * election_lbl + gender_code * age_group
+      +ethnic_code * election_lbl + ethnic_code * age_group + election_lbl * age_group,
       prior = c(prior(normal(0, 1), class = Intercept),
                 prior(normal(0, 1), class = b),
                 prior(normal(0, 1), class = sd)),
-      iter = 2500, warmup = 500, cores = 2, chains = 2,
+      iter = 1000, warmup = 500, cores = 2, chains = 2,
       seed = 10, file = "whovotes_model.rda")
 summary(adm1)
