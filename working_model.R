@@ -60,6 +60,6 @@ adm1 <-
       prior = c(prior(normal(0, 1), class = Intercept),
                 prior(normal(0, 1), class = b),
                 prior(normal(0, 1), class = sd)),
-      iter = 1000, warmup = 500, cores = 2, chains = 2,
+      iter = 2500, warmup = 500, cores = 2, chains = 2,
       seed = 10, file = "whovotes_model.rda")
 summary(adm1)
