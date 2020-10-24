@@ -257,9 +257,10 @@ voters_history_condensed <- voters_history_condensed %>%
   mutate(county_desc = tolower(county_desc)) %>%
   mutate(race_code = as.character(race_code)) %>%
   mutate(ethnic_code = as.character(ethnic_code)) %>%
-  mutate(gender_code = as.character(gender_code))
+  mutate(gender_code = as.character(gender_code)) %>%
+  mutate(election_lbl = as.Date(election_lbl, format = '%m/%d/%Y'))
 final_census <- final_census %>%
-  mutate(county_desc = tolower(county_desc))
+  mutate(county_desc = tolower(county_desc)) 
 modeling_data_2 <- merge(voters_history_condensed, final_census, by = c("age_group", "gender_code", "race_code", "ethnic_code", "county_desc", "election_lbl"), all.x = TRUE)
 ```
 
