@@ -20,9 +20,7 @@ voters$voter_reg_num <- as.integer(voters$voter_reg_num)
 voters_history <- merge(voters, his, by=c("voter_reg_num", "county_id")) #need to fix this line, dunno what happening
 ```
 
-```{r}
-names(voters_history)
-```
+
 
 ```{r}
 voters_history <- voters_history %>% mutate(
