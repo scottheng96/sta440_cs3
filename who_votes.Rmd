@@ -10,7 +10,7 @@ output:
 ```{r, include=FALSE}
 library(kableExtra)
 library(brms)
-
+library(tidyverse)
 ```
 
 # Introduction
