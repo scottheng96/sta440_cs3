@@ -1,8 +1,14 @@
 ---
 title: "Who Votes?"
 date: "10/20/2020"
-output: pdf_document
+output:   
+  pdf_document:
+     latex_engine: xelatex
 ---
+
+```{r, include=FALSE}
+library(kableExtra)
+```
 
 # Introduction
 
@@ -21,7 +27,60 @@ In Grofman's paper, "Models of voter turnout: a brief idiosyncratic review," he 
 
 Several data sources were used to build the model. To start, we used information from the North Carolina voter registration database. The first dataset from this source was a file containing all registered voters in North Carolina. Each row represents an individual, and we also have their current voter status, the county they live in, the day they registered to vote, what political party they're a member of, as well as other demographic information like race, ethnicity, gender, and age. The second dataset from this source contained actual voting records from the 2016 and 2018 elections. Each row represents a vote, and includes other information like county, voter registration number, election, voting method, which party was voted for, and the precinct. 
 
+To engineer an appropriate data set relevant to the research goals, we first merged both data sets together using the voting registration numbers to have a collective dataset with all the predictors relevant to the study. We then modified the ages of voters from their specific ages to age groups, so as to align with other census data, and allow for better interpretability of this predictor when perform model analysis. Finally, we grouped the data into different groups based on our factored predictors, resulting in a dataset with 30673 rows and 7 columns. Details of the predictor variables are described in Table 1.1.
+
+```{r, echo=FALSE, warning=FALSE}
+features_tbl <- data.frame(
+  Metric = c(rep("n", 1),
+             rep("race", 2),
+             rep("gender",1),
+             rep("ethnicity",1),
+             rep("age group",1),
+             rep("county",1),
+             rep("election date",1)),
+  
+  Groups = linebreak(c("Number of voters",
+                       "A = Asian or Pacific Islander, B = Black, not of Hispanic Origin, I =,  M = ", 
+                       "O = , U = , W = ", 
+                       "M = Male, F = Female, U = Preferred not to respond", 
+                        "HL = , NL = , UN = ",
+                       "Age groups of 18-24, 25-44, 45-64, 65+",
+                       "North Carolina's 100 counties",
+                       "Election dates of 11/06/2018, 11/08/2016")
+  )
+)
+features_tbl %>% 
+  kable(escape=F,   booktabs = T, align = "c",
+        caption = "Table 1.1 Description Table of Data set variables",) %>%
+  kable_styling(latex_options = c("hold_position")) %>% 
+  collapse_rows(columns = 1, latex_hline = "major") %>% 
+  row_spec(0, bold = TRUE) #%>% 
+#column_spec(column = c(2), latex_column_spec = "c")
+```
+
+Performing explanatory data analysis on the data set, we noted that there are unequal representation of certain groups within each predictor variables. Figures 1.1-1.4 show histograms of the counts of observations in terms of age group, race, ethnicity and gender. From these plots, we can observe that the majority of the observations that represent voters disproportionately identify their race as white, or identify their ethnicity as HL. We have slightly more female voters than male voters with little representation outside of these two specified genders, as well as having most of the voters between the ages of 45-64.
+
+![](eda.png)
+
+
 # Model
+
+To build the model that predicts who votes specifically in the state of North Carolina, we fit a simple logistic regression model with the response variable being the number of people who voted, and the predictor variables being race, ethnicity, election date (2016 and 2018), gender and county, with all predictors being factor variables. 
+
+The model for race $i$, ethnicity $j$, election date $k$, gender $l$,county $m$ and age group $q$ to predict the number of people who voted $n_{voting,ijklm}$ can be written in statistical notation as:
+
+$$
+\begin{aligned}
+    n_{voting,ijklmq}  \sim Binomial(n_{ijklm}, p_{ijklmq}) \\ \\
+    logit(p_{ijklmq}) = \alpha + \beta_1 * race_i + \beta_2* ethnicity_j + \beta_3 electiondate_k  \\ + \beta_4 * gender_l + \beta_5 * county_m+ \beta_6 * agegroup_q\\
+    \\
+    \alpha \sim N(0,1) ,  \beta_b \sim N(0,1)  
+ \end{aligned}
+$$
+
+As a start, we are using N(0,1) for all intercepts and coefficients with prior motivations being the intuitive expectation for various factors to have equal effects on whether someone votes or not. Furthermore, in order to estimate the number of people who voted as a binomial probability, we give a number of "trials" using the number of registered voters in those groups as that number. This is so the predicted probabilities obtained from the model accurately reflect the proportion of registered voters who are actually voting. The baseline for our model predicts the number of people voting that are white, female, non-Hispanic and in the age group of 18-24.
+
+
 
 # Results
 
