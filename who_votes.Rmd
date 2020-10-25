@@ -130,7 +130,8 @@ var1 <- readRDS("whovotes_model_01var.rda.rds")
 library(brms)
 summary(var1)
 ```
- ## Model Traceplots
+ 
+## Model Traceplots
  
  ![](var1_mixing.png)
  
