@@ -57,23 +57,37 @@ voters_history <- voters_history %>% mutate(
 
 ```{r}
 library(ggplot2)
-voters_history %>% ggplot(aes(x = age_group)) + geom_bar()
+age_plot <- voters_history %>% ggplot(aes(x = age_group)) + geom_bar(fill = " black") +
+            labs(title="Count of voters by Age Group", caption = "Figure 1.1 Histogram of voter counts by age group" ) +
+            theme(plot.title = element_text(hjust = 0.5), plot.caption = element_text(hjust = 0.5))
 ```
 
 ```{r}
 library(ggplot2)
-voters_history %>% ggplot(aes(x = race_code)) + geom_bar()
+race_plot <- voters_history %>% ggplot(aes(x = race_code)) + geom_bar(fill = " black") +
+            labs(title="Count of voters by Race", caption = "Figure 1.2 Histogram of voter counts by race" ) +
+            theme(plot.title = element_text(hjust = 0.5), plot.caption = element_text(hjust = 0.5))
 ```
 
 ```{r}
 library(ggplot2)
-voters_history %>% ggplot(aes(x = ethnic_code)) + geom_bar()
+ethnicity_plot <- voters_history %>% ggplot(aes(x = ethnic_code)) + geom_bar(fill = " black") +
+            labs(title="Count of voters by Ethnicity", caption = "Figure 1.3 Histogram of voter counts by ethnicity" ) +
+            theme(plot.title = element_text(hjust = 0.5), plot.caption = element_text(hjust = 0.5))
 ```
 
 
 ```{r}
 library(ggplot2)
-voters_history %>% ggplot(aes(x = gender_code)) + geom_bar()
+gender_plot <- voters_history %>% ggplot(aes(x = gender_code)) + geom_bar(fill = " black") +
+            labs(title="Count of voters by Gender", caption = "Figure 1.4 Histogram of voter counts by gender" ) +
+            theme(plot.title = element_text(hjust = 0.5), plot.caption = element_text(hjust = 0.5))
+```
+
+```{r}
+library(gridExtra)
+g<- grid.arrange(age_plot,race_plot,ethnicity_plot,gender_plot, ncol=2)
+ggsave(file="eda.png", g,width = 10, height = 8)
 ```
 
 ```{r}
