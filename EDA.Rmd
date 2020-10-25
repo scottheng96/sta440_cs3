@@ -77,6 +77,7 @@ senate_polls %>%
 
 
 ```{r nc-house-races}
+## FIXME includes polls from long ago (see chunk below)
 NC_house <- house_polls %>%
   filter(state == "North Carolina") %>%
   filter(candidate_party == "REP" | candidate_party == "DEM")
@@ -95,5 +96,38 @@ NC_senate %>%
   ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = pct, color = as.factor(candidate_party))) + geom_point() + scale_colour_manual(values = c("DEM" = "#123adb", "REP" = "#E01414"))
 ```
 
+```{r}
+recent_NC_house = NC_house %>% 
+  mutate(day=as.Date(end_date, format = "%m/%d/%y")) %>%
+  filter(day >= as.Date('2019-01-01'))
 
+recent_NC_house_dems = recent_NC_house %>% filter(candidate_party == 'DEM')
 
+table(droplevels(recent_NC_house_dems$seat_name))
+droplevels(recent_NC_house_dems[,c('seat_name', 'day')])
+
+# 3, 8, 9, 11
+district_name = 'District 3'
+recent_NC_house_dems %>% 
+  filter(seat_name == district_name) %>%
+  ggplot(aes(x=day, y=pct)) + 
+    geom_point() + 
+    labs(title=district_name) + xlab('Date') + ylab('Percent') +  
+    scale_colour_manual(values = c("DEM" = "#123adb", "REP" = "#E01414")) + 
+    geom_hline(yintercept=50)
+```
+
+```{r}
+filtered_NC_senate = NC_senate %>% 
+  mutate(day = as.Date(end_date, format = "%m/%d/%y")) %>% 
+  filter(candidate_party == 'DEM', day >= as.Date('2020-01-01'))
+
+# unique(NC_senate$candidate_party)
+
+filtered_NC_senate %>%
+  ggplot(aes(x=day, y=pct)) + 
+    geom_point() + 
+    scale_colour_manual(values = c("DEM" = "#123adb", "REP" = "#E01414")) + 
+    geom_vline(xintercept=as.Date('2020-10-06')) + 
+    geom_hline(yintercept=50)
+```
