@@ -1,0 +1,77 @@
+---
+title: "Untitled"
+author: "Nathan O'Hara"
+date: "10/24/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+strong_var_model = readRDS("whovotes_model_strongest.rda.rds")
+```
+
+
+```{r}
+summary(strong_var_model)
+```
+
+
+```{r}
+real_model = readRDS("whovotes_model_01var.rda.rds")
+```
+
+
+```{r}
+summary(real_model, waic = T, loo = T)
+```
+
+```{r}
+#library(loo)
+brms::LOO(real_model)
+```
+
+```{r}
+# Calculating LOO estimate for the strong model for sensitivity analysis
+brms::LOO(strong_var_model)
+```
+
+```{r}
+plot(real_model)
+```
+
+```{r}
+library(loo)
+```
+
+
+```{r}
+# Takes too long
+loo1 <- loo(real_model)
+```
+
+```{r}
+pp <- brms::pp_check(real_model)
+```
+
+```{r}
+library(ggplot2)
+pp
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
