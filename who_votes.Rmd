@@ -84,6 +84,9 @@ As a start, we are using N(0,1) for all intercepts and coefficients with prior m
 
 ## Validation
 
+## Sensitivity Analysis
+In addition to our model built using a variance of 1, we also built a model with variance of 0.001 for comparison. We ultimately decided to go with the first model, because the model of smaller variance had many coefficients close to zero that were hard to interpret. Additionally, we ran leave-one-out cross-validation on both models, and while neither model had great performance, the smaller variance model was significantly worse. Additionally, we ran posterior predictive checks on both models, and there were no discernable differences between the two models, thus leading us to believe that there was no advantage of choosing the smaller variance model over the larger variance model. Both models also seemed to display good mixing behavior, and the traceplots can be seen in the Appendix. 
+
 # Results
 
 When controlling for county as a random effect, we estimate the odds that a white, female, non-Hispanic female between the ages of 18-24 in North Carolina voted in the 2018 mid-term election is `r exp(-1.24)`. There are 100 different intercepts for the 100 counties in North Carolina, and these estimates have a standard deviation of 0.14. 
@@ -99,6 +102,12 @@ In terms of ethnicity, the odds that someone votes given they are Hispanic or La
 Finally, we examine the effect of age on odds of voting. Holding all other variables constant, the odds of voting seems to increase with age until one reaches 65, then it decreases a bit. Specifically, the odds of voting for someone between the ages of 25 and 44 is `r exp(0.92)` times the odds of someone from 18-24 voting, the odds of voting for someone between the ages of 45 and 64 is `r exp(1.75)` times the odds of someone from 18-24 voting, and the odds of voting for someone over 65 is `r exp(1.56)` times the odds of someone from 18-24 voting.
 
 All that being said, our model also includes lots of interaction effects. This means that the odds of voting vary differently depending on all the levels of our predictors. For example, our lowest interaction effect occurs when race and gender are both unspecified. This means that as we hold age, ethnicity, and election constant, we expect the odds of a person of unspecified race and gender's odds to multiply by an additional `r exp(-0.48)`, or by a total of `r exp(-0.48 + -0.52 + 0.40)` times the odds of a white female voting. One of our highest interaction effects occurs when gender is unspecified and when ethnicity is Hispanic or Latino. This means that as we hold age, race, and election constant, we expect the odds of a person of unspecified race and gender's odds to multiply by an additional `r exp(0.65)`, or by a total of `r exp(0.65 + 0.40 + -0.05)` times the odds of a white female voting.
+
+For a full list of our model coefficients, please see the appendix. 
+
+# Discussion 
+
+Our model strives to predict voter turnout across different racial, ethnic, gender, and age groups. We chose to examine turnout at the group level, since previous literature stated that predicting whether or not an individual votes has not been very successful in the past. One of the major limitations in our model is due to the nature of the North Carolina voter registration data. Our file of registered voters included people who registered after the 2016 election, which means they would not have been able to vote then. Additionally, it omits people who haven't voted since 2008. For the 2020 election, there has been increased effort urging more and more people to vote, so it is possible that some of these overlooked people might decide to vote again. Also, on that same note, our model looks at the odds of voting in the 2016 presidential election and the 2018 midterm election. We are basing our predictions of voters in the 2020 election off of these past voter totals, but there could be something systematically different about this election that is not being captured in our model due to the use of past data. Further research could seek to make use of data from more sources, for example socio-economic status and education level. The inclusion of more predictors might improve our model fit. 
 
 # Citations
 
@@ -116,10 +125,13 @@ Wislek, J. (n.d.). Predicting Voter Turnout. Retrieved October 22, 2020, from ht
 
 
 ## Full Model Output
-```{r}
+```{r, echo = F}
 var1 <- readRDS("whovotes_model_01var.rda.rds")
 library(brms)
 summary(var1)
-
 ```
-
+ ## Model Traceplots
+ 
+ ![](var1_mixing.png)
+ 
+ ![](var001_mixing.png)
