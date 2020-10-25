@@ -1,10 +1,12 @@
 ---
 title: "Who Votes?"
-date: "10/20/2020"
 author: "Ashley Murray, Hunter Gregory, Matty Pahren, Nathan O'Hara, Scott Heng"
-output:   
+date: "10/20/2020"
+output:
+  html_document:
+    df_print: paged
   pdf_document:
-     latex_engine: xelatex
+    latex_engine: xelatex
 ---
 
 ```{r, include=FALSE}
@@ -173,18 +175,12 @@ summary(var1)
 Traceplots and posterior densities for all fit coefficients in the model with prior variances of 0.1:
 
 ```{r}
-param_names = parnames(var1)
-for (name in param_names){
-  plot(var1, pars = c(name), ask = FALSE)
-}
+plot(var1,ask = FALSE)
 ```
 
 Same output for model with prior variances of 0.001:
 
 ```{r}
-param_names = parnames(var001)
-for (name in param_names){
-  plot(var001, pars = c(name), ask = FALSE)
-}
+plot(var001, ask = FALSE)
 ```
  
