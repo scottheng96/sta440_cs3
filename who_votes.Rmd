@@ -9,6 +9,8 @@ output:
 
 ```{r, include=FALSE}
 library(kableExtra)
+library(brms)
+
 ```
 
 # Introduction
@@ -30,7 +32,7 @@ In Grofman's paper, "Models of voter turnout: a brief idiosyncratic review," he 
 
 Several data sources were used to build the model. To start, we used information from the North Carolina voter registration database. The first dataset from this source was a file containing all registered voters in North Carolina. Each row represents an individual, and we also have their current voter status, the county they live in, the day they registered to vote, what political party they're a member of, as well as other demographic information like race, ethnicity, gender, and age. The second dataset from this source contained actual voting records from the 2016 and 2018 elections. Each row represents a vote, and includes other information like county, voter registration number, election, voting method, which party was voted for, and the precinct. 
 
-To engineer an appropriate data set relevant to the research goals, we first merged both data sets together using the voting registration numbers to have a collective dataset with all the predictors relevant to the study. We then modified the ages of voters from their specific ages to age groups, so as to align with other census data, and allow for better interpretability of this predictor when perform model analysis. Finally, we grouped the data into different groups based on our factored predictors, resulting in a dataset with 30673 rows and 7 columns. Details of the predictor variables are described in Table 1.1.
+To engineer an appropriate data set relevant to the research goals, we first merged both data sets together using the voting registration numbers to have a collective dataset with all the predictors relevant to the study. We then modified the ages of voters from their specific ages to age groups, so as to align with other census data, and allow for better interpretability of this predictor when performing model analysis. Finally, we grouped the data into different groups based on our factored predictors, resulting in a dataset with 30673 rows and 7 columns. Details of the predictor variables are described in Table 1.1.
 
 ```{r, echo=FALSE, warning=FALSE}
 features_tbl <- data.frame(
@@ -65,28 +67,62 @@ Performing explanatory data analysis on the data set, we noted that there are un
 
 ![](eda.png)
 
-
 # Model
 
-To build the model that predicts who votes specifically in the state of North Carolina, our approach involved using a binomial multi-level model to predict the number of voters based on groups in our predictor variables. We fit a simple logistic regression model with the response variable being the number of people who voted, and the predictor variables being race, ethnicity, election date (2016 and 2018), gender and county, with all predictors being factor variables. 
+To build the model that predicts who votes specifically in the state of North Carolina, our approach involved using a binomial multi-level model to predict the number of voters based on groups in our predictor variables. We fit a logistic regression model with the response variable being the number of people who voted, and the predictor variables being race, ethnicity, election date (2016 and 2018), gender and county, with all predictors being factor variables. 
 
 The model for race $i$, ethnicity $j$, election date $k$, gender $l$,county $m$ and age group $q$ to predict the number of people who voted $n_{voting,ijklm}$ can be written in statistical notation as:
 
 $$
 \begin{aligned}
     n_{voting,ijklq}  \sim Binomial(n_{ijklq}, p_{ijklq}) \\ \\
-    logit(p_{ijklq}) = \alpha_{county} + \beta_1 * race_i + \beta_2* ethnicity_j + \beta_3 electiondate_k  \\ + \beta_4 * gender_l + \beta_5 * agegroup_q\\
+    logit(p_{ijklq}) = \alpha_{county} + \sum_{i = 1}^{7}  \beta_i * race_i + \sum_{j=8}^{10} \beta_j* ethnicity_j + \beta_{11} * electiondate_k  \\ + \sum_{l=12}^{14} \beta_l * gender_l + \sum_{q=15}^{18} \beta_q * agegroup_q\\ + \sum_{r = 19}^{89} \beta_r *\text{(all two-way interactions, excluding electiondate)}
     \\
-    \alpha \sim N(0,1) ,  \beta_b \sim N(0,1)  
+    \alpha \sim N(0,0.1) ,  \beta_b \sim N(0,0.1)  
  \end{aligned}
 $$
 
-As a start, we are using N(0,1) for all intercepts and coefficients with prior motivations being the intuitive expectation for various factors to have equal effects on whether someone votes or not. Furthermore, in order to estimate the number of people who voted as a binomial probability, we give a number of "trials" using the number of registered voters in those groups as that number. This is so the predicted probabilities obtained from the model accurately reflect the proportion of registered voters who are actually voting. The baseline for our model predicts the number of people voting in the 2018 mid-term election that are white, female, non-Hispanic and in the age group of 18-24.
+The binomial variable is modeled as the number of people voting in any given group, as compared to the number of registered voters in that group.($p$ modeling the proportion of registered voters in that group who actually voted.) The probabilities $p$ are based around this ratio. We believe North Carolina Census totals would be a better representation than number of registered voters in 2008-2018. However, we found inconsistencies in the data; when we compared Census totals to voter totals for a given year, we found some groups had much larger than 100% voter turnout. While this could be due to any number of factors, most of the groups with such inconsistencies were in the 18-24 or 25-44 age brackets, which could imply that numbers are thrown off by a large population of college students who vote in North Carolina but who are accounted for elsewhere in the census.
+
+As a start, we are using N(0,0.1) for all intercepts and coefficients with prior motivations being the intuitive expectation for various factors to have equal effects on whether someone votes or not. Furthermore, in order to estimate the number of people who voted as a binomial probability, we give a number of "trials" using the number of registered voters in those groups as that number. This is so the predicted probabilities obtained from the model accurately reflect the proportion of registered voters who are actually voting. The baseline for our model predicts the number of people voting in the 2018 mid-term election that are white, female, non-Hispanic and in the age group of 18-24.
 
 ## Validation
+```{r, include = FALSE}
+# Load models and data
+var001 = readRDS("whovotes_model_strongest.rda.rds")
+var1 <- readRDS("whovotes_model_01var.rda.rds")
+modeling_data = read_csv("./data/who-votes-binned-data.csv")
+```
+
+```{r, fig.show="hold", out.width="33%", echo = FALSE, warning = FALSE, message = FALSE}
+model_diagnostic_df = data.frame(residual = resid(var1), predicted = predict(var1), actual = modeling_data$n)
+model_diagnostic_df %>% ggplot(aes(x = actual, y = predicted.Estimate)) + geom_point() + labs(x = "Actual Number Voting", y = "Predicted Number Voting")
+model_diagnostic_df %>% ggplot(aes(x = predicted.Estimate, y = residual.Estimate)) + geom_point() + labs(x = "Predicted Number Voting", y = "Residual")
+model_diagnostic_df %>% ggplot(aes(x = residual.Estimate)) + geom_histogram(bins = 50) + labs(x = "Residual", y = "Count")
+```
+
+Given the motivation for our model is interpretation, predictive accuracy is less important than overall model fit. To demonstrate the effectiveness of our model in fitting the data, residual plots are shown. A plot of actual versus predicted values of number voting per group shows an almost perfect linear association, indicating that the model's predictions were generally accurate. A plot of residuals versus predicted values is centered at zero, and with generally equal numbers of positive and negative residuals. The variance seems to increase as group populations increase, but as a percentage of population, these residuals are not indicative of a serious poor fit, as per the linear trend in actual versus predicted values. A histogram of residuals shows normality, centered at zero. 
+
+Posterior predictive charts are shown, demonstrating that the distribution of actual values matches distribution of posterior samples relatively well, and that average predicted error tends to be close to zero, deviating primarily where populations are large. Leave-one-out cross validation estimates were computed on the model using the *loo* package as well. This indicated a poor model specification with a value of the effective number of parameters much greater than the true number of parameters (3010 vs. 89). However, there is room for doubt that this indicates a poor fit, given the effectiveness shown in the residual plots. We speculate that leave-one-out cross validation may not be a good metric for evaluation with 30,000 rows of data. We began evaluating the model using an approximation to 10-fold cross validation instead. Though results are not ready for this submission, they will be included in subsequent submissions.
+
+
+```{r, fig.show="hold", out.width="50%", echo = FALSE, warning = FALSE, message = FALSE}
+pp_check(var1)
+pp_check(var1, type = "error_scatter_avg")
+```
+
 
 ## Sensitivity Analysis
-In addition to our model built using a variance of 1, we also built a model with variance of 0.001 for comparison. We ultimately decided to go with the first model, because the model of smaller variance had many coefficients close to zero that were hard to interpret. Additionally, we ran leave-one-out cross-validation on both models, and while neither model had great performance, the smaller variance model was significantly worse. Additionally, we ran posterior predictive checks on both models, and there were no discernable differences between the two models, thus leading us to believe that there was no advantage of choosing the smaller variance model over the larger variance model. Both models also seemed to display good mixing behavior, and the traceplots can be seen in the Appendix. 
+In addition to our model built using a prior variance of 0.1 for all coefficients, we also built a model with variance of 0.001 for comparison. A third model, with prior variances 0.01, was also created, but did not finish running in time for proper comparison with the other models. 
+
+Comparing the model with 0.1 variance to the model with 0.001 variance, the coefficients in the latter model were understandably all very close to zero. To determine which model better fit the data, we used the *loo* package to estimate leave-one-out cross validation error based on the posterior samples generated in *brms*. This specification outputs a value representing the difference in expected log pointwise predictive density between the two models. If this value has a high magnitude, it indicates that one model has significantly outperformed the other in estimated leave-one-out cross validation. The value came out to -405534, indicating that the model with variance 0.1 provided a substantially better fit than the model with stronger priors.
+
+Additionally, posterior predictive checks show the average prediction error of the model with stronger priors tends to be less accurate than that of the primary model. Both models also seemed to display good mixing behavior, and the traceplots can be seen in the Appendix. 
+
+```{r, fig.show="hold", out.width="50%", fig.cap = "Posterior predictive checks on average predictive error. Left is model with 0.1 variance, right is model with 0.001 variance priors.", echo = FALSE, warning = FALSE, message = FALSE}
+pp_check(var1, type = "error_scatter_avg")
+pp_check(var001, type = "error_scatter_avg")
+```
 
 # Results
 
@@ -134,6 +170,21 @@ summary(var1)
  
 ## Model Traceplots
  
- ![](var1_mixing.png)
+Traceplots and posterior densities for all fit coefficients in the model with prior variances of 0.1:
+
+```{r}
+param_names = parnames(var1)
+for (name in param_names){
+  plot(var1, pars = c(name), ask = FALSE)
+}
+```
+
+Same output for model with prior variances of 0.001:
+
+```{r}
+param_names = parnames(var001)
+for (name in param_names){
+  plot(var001, pars = c(name), ask = FALSE)
+}
+```
  
- ![](var001_mixing.png)
