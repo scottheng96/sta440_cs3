@@ -1,6 +1,7 @@
 ---
 title: "Who Votes?"
 date: "10/20/2020"
+author: "Ashley Murray, Hunter Gregory, Matty Pahren, Nathan O'Hara, Scott Heng"
 output:   
   pdf_document:
      latex_engine: xelatex
