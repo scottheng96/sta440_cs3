@@ -67,7 +67,7 @@ Performing explanatory data analysis on the data set, we noted that there are un
 
 # Model
 
-To build the model that predicts who votes specifically in the state of North Carolina, we fit a simple logistic regression model with the response variable being the number of people who voted, and the predictor variables being race, ethnicity, election date (2016 and 2018), gender and county, with all predictors being factor variables. 
+To build the model that predicts who votes specifically in the state of North Carolina, our approach involved using a binomial multi-level model to predict the number of voters based on groups in our predictor variables. We fit a simple logistic regression model with the response variable being the number of people who voted, and the predictor variables being race, ethnicity, election date (2016 and 2018), gender and county, with all predictors being factor variables. 
 
 The model for race $i$, ethnicity $j$, election date $k$, gender $l$,county $m$ and age group $q$ to predict the number of people who voted $n_{voting,ijklm}$ can be written in statistical notation as:
 
@@ -120,6 +120,5 @@ Wislek, J. (n.d.). Predicting Voter Turnout. Retrieved October 22, 2020, from ht
 var1 <- readRDS("whovotes_model_01var.rda.rds")
 library(brms)
 summary(var1)
-
 ```
 
