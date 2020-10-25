@@ -19,7 +19,9 @@ In this report, we seek to build a comprehensive model predicting who votes, spe
 # Literature Review
 
 Previous studies have examined different ways of estimating who votes, but there does not appear to be any general consensus in the best way of modeling this. In one study (Wislek), the author attempts to predict voter turnout rates based on an area's violent crime rate, number of US House Representatives, and several other political factors. However, this data is examined at the state level, so there might be differences across counties that aren't being captured. 
+
 Another paper by Challenor states the importance of likely voter models in election forecasting, and goes onto predict voter turnout based on US Census questions. They compared several models, the best of which had 87.82% accuracy, and determined that the features most correlated with voting included education level, marital status, and major job industry, while the variables with least correlated with voting were marital status based on armed forces participation, intermediate job industry, and age. 
+
 In Grofman's paper, "Models of voter turnout: a brief idiosyncratic review," he examines many old studies about voting models, and some date back to as early as 1957. He says that the two main schools of thought in voter prediction modeling are  predicting turnout in terms of demographic or attitudinal factors and the other is estimating voter turnout by thinking of voting as a "rational choice calculus" where citizens estimate the costs and benefits of voting. In the end, he determines that both methods produce similar results: it is very hard to explain which individuals will vote or not, but models have found more success in predicting which categories of people vote depending on group characteristics and the election.
 
 
@@ -78,11 +80,25 @@ $$
  \end{aligned}
 $$
 
-As a start, we are using N(0,1) for all intercepts and coefficients with prior motivations being the intuitive expectation for various factors to have equal effects on whether someone votes or not. Furthermore, in order to estimate the number of people who voted as a binomial probability, we give a number of "trials" using the number of registered voters in those groups as that number. This is so the predicted probabilities obtained from the model accurately reflect the proportion of registered voters who are actually voting. The baseline for our model predicts the number of people voting that are white, female, non-Hispanic and in the age group of 18-24.
+As a start, we are using N(0,1) for all intercepts and coefficients with prior motivations being the intuitive expectation for various factors to have equal effects on whether someone votes or not. Furthermore, in order to estimate the number of people who voted as a binomial probability, we give a number of "trials" using the number of registered voters in those groups as that number. This is so the predicted probabilities obtained from the model accurately reflect the proportion of registered voters who are actually voting. The baseline for our model predicts the number of people voting in the 2018 mid-term election that are white, female, non-Hispanic and in the age group of 18-24.
 
-
+## Validation
 
 # Results
+
+When controlling for county as a random effect, we estimate the odds that a white, female, non-Hispanic female between the ages of 18-24 in North Carolina voted in the 2018 mid-term election is `r exp(-1.24)`. There are 100 different intercepts for the 100 counties in North Carolina, and these estimates have a standard deviation of 0.14. 
+
+Holding all else constant, we estimate that the odds a given person voted in the 2016 election to be multiplied by a factor of `r exp(0.54)` than the odds they voted in the 2018 mid-term elections. It makes intuitive sense that the odds of voting in 2016 are higher, since it seems that more people tend to vote in presidential elections. This also suggests that using 2016 voting estimates could help us better determine voter turnout in 2020, since this is also a big presidential election. 
+
+When examining gender effects, the odds that someone who identifies as male votes are `r exp(-0.07)` times the odds that someone who identifies as female votes, holding all else constant. This suggests that women are more likely to vote than men. Additionally, people who did not specify their gender when registering to vote are `r exp(0.40)` times more likely to vote than females, holding all else constant. 
+
+Everything else held constant, the odds that someone votes given they are black is `r exp(0.01)` times the odds someone votes given they are white. If a person is Asian, American Indian, Multi-race, or something other, their respective odds of voting relative to someone white multiply by `r exp(-0.10)`, `r exp(-0.25)`, `r exp(0.13)`, and `r exp(-0.41)` respectively, holding all else constant. Lastly, for people who did not specify their race, their odds of voting are, holding all else constant, `r exp(-0.52)` times the odds of someone white voting.
+
+In terms of ethnicity, the odds that someone votes given they are Hispanic or Latino is `r exp(-0.05)` times the odds of voting for someone who is not Hispanic or Latino, holding all else constant, and the odds of voting for someone who did not specify ethnicity are `r exp(-0.02)` times the odds of someone who is reportedly not Hispanic or Latino. 
+
+Finally, we examine the effect of age on odds of voting. Holding all other variables constant, the odds of voting seems to increase with age until one reaches 65, then it decreases a bit. Specifically, the odds of voting for someone between the ages of 25 and 44 is `r exp(0.92)` times the odds of someone from 18-24 voting, the odds of voting for someone between the ages of 45 and 64 is `r exp(1.75)` times the odds of someone from 18-24 voting, and the odds of voting for someone over 65 is `r exp(1.56)` times the odds of someone from 18-24 voting.
+
+All that being said, our model also includes lots of interaction effects. This means that the odds of voting vary differently depending on all the levels of our predictors. For example, our lowest interaction effect occurs when race and gender are both unspecified. This means that as we hold age, ethnicity, and election constant, we expect the odds of a person of unspecified race and gender's odds to multiply by an additional `r exp(-0.48)`, or by a total of `r exp(-0.48 + -0.52 + 0.40)` times the odds of a white female voting. One of our highest interaction effects occurs when gender is unspecified and when ethnicity is Hispanic or Latino. This means that as we hold age, race, and election constant, we expect the odds of a person of unspecified race and gender's odds to multiply by an additional `r exp(0.65)`, or by a total of `r exp(0.65 + 0.40 + -0.05)` times the odds of a white female voting.
 
 # Citations
 
