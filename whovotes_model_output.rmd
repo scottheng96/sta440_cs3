@@ -1,0 +1,60 @@
+---
+title: "Model output"
+author: "Nathan O'Hara"
+date: "10/25/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Below are output for models with:
+- All coefficients/intercepts having N(0,0.1) priors
+- All coefficients/intercepts having M(0,0.001) priors
+
+```{r}
+var1 <- readRDS("whovotes_model_01var.rda.rds")
+var001<- readRDS("whovotes_model_strongest.rda.rds")
+```
+
+```{r}
+library(brms)
+summary(var1)
+```
+
+```{r}
+summary(var001)
+```
+
+Below is code to do posterior distributions of fitted coefficients and MCMC mixing:
+
+```{r}
+plot(var1)
+```
+
+
+Takes forever but this is a comparison of the models based on LOOCV estimates:
+
+```{r}
+brms::LOO(var1, var001)
+```
+
+This is supposed to be a posterior predictive check, but it's pretty hard to read due to dist of data:
+
+```{r}
+brms::pp_check(real_model)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
