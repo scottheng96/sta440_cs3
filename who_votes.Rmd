@@ -113,3 +113,13 @@ Wislek, J. (n.d.). Predicting Voter Turnout. Retrieved October 22, 2020, from ht
 
 
 # Appendix
+
+
+## Full Model Output
+```{r}
+var1 <- readRDS("whovotes_model_01var.rda.rds")
+library(brms)
+summary(var1)
+
+```
+
