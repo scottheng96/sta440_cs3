@@ -40,10 +40,10 @@ features_tbl <- data.frame(
              rep("election date",1)),
   
   Groups = linebreak(c("Number of voters",
-                       "A = Asian or Pacific Islander, B = Black, not of Hispanic Origin, I =,  M = ", 
-                       "O = , U = , W = ", 
+                       "A = Asian, B = Black or African American, I = American Indian or Native American, ", 
+                       "M = Two or more races , O = Other , U = Undesignated, W = White", 
                        "M = Male, F = Female, U = Preferred not to respond", 
-                        "HL = , NL = , UN = ",
+                        "HL = Hispanic or Latino, NL = Non-hispanic/Non-Latino, UN = Undesignated",
                        "Age groups of 18-24, 25-44, 45-64, 65+",
                        "North Carolina's 100 counties",
                        "Election dates of 11/06/2018, 11/08/2016")
@@ -71,8 +71,8 @@ The model for race $i$, ethnicity $j$, election date $k$, gender $l$,county $m$ 
 
 $$
 \begin{aligned}
-    n_{voting,ijklmq}  \sim Binomial(n_{ijklm}, p_{ijklmq}) \\ \\
-    logit(p_{ijklmq}) = \alpha + \beta_1 * race_i + \beta_2* ethnicity_j + \beta_3 electiondate_k  \\ + \beta_4 * gender_l + \beta_5 * county_m+ \beta_6 * agegroup_q\\
+    n_{voting,ijklq}  \sim Binomial(n_{ijklq}, p_{ijklq}) \\ \\
+    logit(p_{ijklq}) = \alpha_{county} + \beta_1 * race_i + \beta_2* ethnicity_j + \beta_3 electiondate_k  \\ + \beta_4 * gender_l + \beta_5 * agegroup_q\\
     \\
     \alpha \sim N(0,1) ,  \beta_b \sim N(0,1)  
  \end{aligned}
