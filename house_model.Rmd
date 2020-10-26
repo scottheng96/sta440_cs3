@@ -36,12 +36,32 @@ hist(full_counties$share_asian2010)
 ```
 
 
+```{r}
+# add incumbent data 
+
+full_counties <- full_counties %>%
+  mutate(incumbent_party = case_when(district == 1 ~ "DEM",
+                                     district == 2 ~ "DEM",
+                                     district == 3 ~ "REP",
+                                     district == 4 ~ "DEM",
+                                     district == 5 ~ "REP",
+                                     district == 6 ~ "REP",
+                                     district == 7 ~ "REP",
+                                     district == 8 ~ "REP",
+                                     district == 9 ~ "REP",
+                                     district == 10 ~ "REP",
+                                     district == 11 ~ "NONE",
+                                     district == 12 ~ "DEM",
+                                     district == 13 ~ "REP"))
+```
+
+
 ```{r multi-level-model}
 library(lme4)
 library(merTools)
 
 # linear mixed model with random effect for county
-M2 <- lmer(Trump.percentage ~ frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = full_counties, control = lmerControl(optimizer ="Nelder_Mead"))
+M2 <- lmer(Trump.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 +  incumbent_party + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = full_counties, control = lmerControl(optimizer ="Nelder_Mead"))
 summary(M2)
 coef(M2)
 
