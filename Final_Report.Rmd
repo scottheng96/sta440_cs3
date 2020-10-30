@@ -1,0 +1,42 @@
+---
+title: "Election Prediction Report"
+author: "Ashley Murray, Hunter Gregory, Matty Pahren, Nathan O'Hara, Scott Heng"
+date: "10/29/2020"
+output: pdf_document
+---
+
+# Introduction
+
+# Methods 
+<!-- modeling and prediction strategy along with the models themselves -->
+
+## Who Votes Model
+
+## Electoral College Model
+
+## US Senate Model
+
+## North Carolina Senate Model
+
+## North Carolina House Model
+
+# Results
+<!-- e.g. point and interval estimates of the % of votes won by each Congressional candidate, point and interval estimates of electoral college vote share  -->
+
+## Electoral College Model Results
+
+## US Senate Model Results
+
+## North Carolina Senate Model Results
+
+## North Carolina House Model Results
+
+# Discussion
+<!-- evaluation of the relative predictive ability of variables in your models as well as discussion of strengths and weaknesses of your strategy.  -->
+
+# Appendix A
+<!-- Numbered list of all models/modeling procedures, with explicit details about model purpose, model structure (models written out using equations!), and resulting estimates from each model (raw output is fine for this appendix). Reproducible code and data should also be uploaded to Sakai. -->
+
+# Appendix B
+<!-- List of all data sets/data sources used, along with an explicit mapping from the models in Appendix A to the variables used from Appendix B in each model. -->
+
