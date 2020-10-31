@@ -22,7 +22,31 @@ his <- readRDS("./data/ncvhis_Statewide_small.rds")
 ```{r}
 voters$voter_reg_num <- as.character(voters$voter_reg_num)
 voters$voter_reg_num <- as.integer(voters$voter_reg_num)
-voters_history <- merge(voters, his, by=c("voter_reg_num", "county_id")) #need to fix this line, dunno what happening
+voters_history <- merge(voters, his, by=c("voter_reg_num", "county_id"))
+```
+
+```{r}
+vo
+```
+
+#fill in the na's for the congressional districts that aren't split
+```{r}
+voters_history_temp <- voters_history %>%
+  mutate(cong_dist = case_when( county_desc.x %in% c("BERTIE", "EDGECOMBE", "GATES", "GREENE", "HALIFAX", "HERTFORD", "MARTIN", "NASH", "NORTHAMPTON", "WARREN", "WASHINGTON", "WAYNE", "WILSON") ~ 1,
+                                county_desc.x %in% c("BEAUFORT", "CAMDEN", "CARTERET", "CHOWAN", "CRAVEN", "CURRITUCK", "DARE", "DUPLIN", "HYDE", "JONES", "LENOIR", "ONSLOW", "PAMLICO", "PASQUOTANK", "PERQUIMANS", "TYRRELL") ~ 3,
+                                county_desc.x %in% c("FRANKLIN", "GRANVILLE", "ORANGE") ~ 4,
+                                county_desc.x %in% c("BURKE", "CLEVELAND", "GASTON", "ALEXANDER", "ALLEGHANY", "ASHE", "CALDWELL", "WILKES", "WATAUGA") ~ 5,
+                                county_desc.x %in% c("BRUNSWICK", "COLUMBUS", "SAMPSON", "NEW HANOVER", "PENDER") ~ 7,
+                                county_desc.x %in% c("CABARRUS", "STANLY", "MONTGOMERY") ~ 8,
+                                county_desc.x %in% c("HOKE", "MOORE", "ANSON", "UNION", "SCOTLAND", "ROBESON", "RICHMOND") ~ 9,
+                                county_desc.x %in% c("ROCKINGHAM", "STOKES", "SURRY", "YADKIN", "LINCOLN") ~ 10,
+                                county_desc.x %in% c("AVERY", "POLK", "CHEROKEE", "CLAY", "GRAHAM", "HAYWOOD", "HENDERSON", "JACKSON", "YANCEY", "TRANSYLVANIA", "SWAIN", "MACON", "MADISON", "MCDOWELL", "MITCHELL") ~ 11,
+                                county_desc.x %in% c("ALAMANCE", "CASWELL", "PERSON", "RANDOLPH", "DAVIDSON", "DAVIE") ~ 13))
+```
+
+```{r}
+voters_history_temp <- voters_history_temp %>%
+  mutate(mycol = coalesce(cong_dist, cong_dist_abbrv))
 ```
 
 # Model
@@ -113,6 +137,7 @@ voters_history_condensed <- voters_history_condensed %>% rename(county_desc = co
 ```{r}
 modeling_data <- inner_join(voters_history_condensed, registered_voters, by = c("race_code", "gender_code", "ethnic_code","age_group", "election_lbl", "county_desc"))
 ```
+
 
 ```{r}
 #library(brms)
