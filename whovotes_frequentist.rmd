@@ -12,7 +12,7 @@ library(tidyverse)
 ```
 
 ```{r}
-modeling_data <- read_csv("./data/who-votes-binned-data.csv")
+modeling_data <- read_csv("./data/whovotes_train_data_final.csv")
 validation_data <- read_csv("./data/whovotes_validation_data.csv")
 ```
 
@@ -91,18 +91,28 @@ validation_data <- validation_data %>% mutate(
 )
 ```
 
+Bookmark:
+
 ```{r}
-# Take a random sample of the data before running
-modeling_data_sample <- modeling_data_split %>% group_by(congressional_dist) %>% sample_n(250)
+# Need to group it by cong dist
+modeling_data_split <- modeling_data_split %>% group_by(race_code, sex_code, ethnic_code, age_group, party_cd, gender_code, congressional_dist, presidential) %>% summarise(n = sum(n), n_registered = sum(n_registered))
 ```
+
+
+```{r}
+modeling_data_sample <- modeling_data_split[sample(nrow(modeling_data_split), 5000),]
+```
+
+
 
 
 ```{r}
 # Fit lmer model for binomial
 # Also look at hunter's commits when you're done
-model.basic <- glmer(n/n_registered ~ 1 + race_code + gender_code + ethnic_code + age_group + presidential + (1 + race_code + gender_code + ethnic_code + age_group + presidential|congressional_dist),
+model.basic <- glmer(n/n_registered ~ 1 + race_code + gender_code + ethnic_code + age_group + party_cd + presidential + (1 + race_code + gender_code + ethnic_code + age_group + party_cd + presidential|congressional_dist),
                      data = modeling_data_sample, weights = n_registered,
                      family = "binomial")
+# Started running: 5:38 pm
 ```
 
 
