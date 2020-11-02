@@ -94,3 +94,14 @@ modified_counties %>%
 
 ```
 
+# Senate Predictions
+```{r}
+# estimate percentages across whole state
+modified_counties %>%
+  summarise(dist_share_rep = sum(fit*voters)/sum(voters),
+            dist_lwr_rep = sum(lower*voters)/sum(voters),
+            dist_upr_rep = sum(upper*voters)/sum(voters))
+
+```
+
+
