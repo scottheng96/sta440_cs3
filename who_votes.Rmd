@@ -65,7 +65,7 @@ features_tbl %>%
 
 Performing explanatory data analysis on the data set, we noted that there are unequal representation of certain groups within each predictor variables. Figures 1.1-1.4 show histograms of the counts of observations in terms of age group, race, ethnicity and gender. From these plots, we can observe that the majority of the observations that represent voters disproportionately identify their race as white, or identify their ethnicity as HL. We have slightly more female voters than male voters with little representation outside of these two specified genders, as well as having most of the voters between the ages of 45-64.
 
-![](eda.png)
+![](eda.png){width=50%}
 
 # Model
 
