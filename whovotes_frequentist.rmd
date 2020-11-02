@@ -1,0 +1,124 @@
+---
+title: 'Who Votes: Frequentist and Validation'
+author: "Nathan O'Hara"
+date: "11/1/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(lme4)
+library(tidyverse)
+```
+
+```{r}
+modeling_data <- read_csv("./data/who-votes-binned-data.csv")
+validation_data <- read_csv("./data/whovotes_validation_data.csv")
+```
+
+```{r}
+# Duplicate and half split counties
+dupe_counties <- modeling_data %>% filter(county_desc %in% c("CATAWBA", "CHATHAM", "FORSYTH", "HARNETT", "IREDELL", "LEE", "MECKLENBURG", "MOORE", "PITT", "RUTHERFORD", "VANCE", "WAKE"))
+```
+
+```{r}
+# Change the name of dupe counties to have a 2 at the end of it. Then halve all the numbers. Then go back into modeling data, and halve all the numbers for the 
+# counties that have been duplicated.
+dupe_counties <- dupe_counties %>% mutate(
+  n = round(n/2),
+  n_registered = round(n_registered/2)
+)
+```
+
+```{r}
+dupe_counties <- dupe_counties %>% mutate(
+  county_desc = paste(county_desc, "_2", sep = "")
+)
+```
+
+```{r}
+modeling_data_split <- modeling_data %>% mutate(
+  n = case_when(
+    county_desc %in% c("CATAWBA", "CHATHAM", "FORSYTH", "HARNETT", "IREDELL", "LEE", "MECKLENBURG", "MOORE", "PITT", "RUTHERFORD", "VANCE", "WAKE") ~ round(n/2),
+    !(county_desc %in% c("CATAWBA", "CHATHAM", "FORSYTH", "HARNETT", "IREDELL", "LEE", "MECKLENBURG", "MOORE", "PITT", "RUTHERFORD", "VANCE", "WAKE")) ~ n
+  ),
+  n_registered = case_when(
+    county_desc %in% c("CATAWBA", "CHATHAM", "FORSYTH", "HARNETT", "IREDELL", "LEE", "MECKLENBURG", "MOORE", "PITT", "RUTHERFORD", "VANCE", "WAKE") ~ round(n_registered/2),
+    !(county_desc %in% c("CATAWBA", "CHATHAM", "FORSYTH", "HARNETT", "IREDELL", "LEE", "MECKLENBURG", "MOORE", "PITT", "RUTHERFORD", "VANCE", "WAKE")) ~ n_registered
+  )
+)
+```
+
+```{r}
+modeling_data_split = rbind(modeling_data_split, dupe_counties)
+```
+
+```{r}
+# Coding congressional districts
+modeling_data_split <- modeling_data_split %>% mutate(
+  congressional_dist = case_when(
+    county_desc %in% c("BERTIE", "EDGECOMBE", "GATES", "GREENE", "HALIFAX", "HERTFORD", "MARTIN", "NASH", "NORTHAMPTON", "PITT", "VANCE", "WARREN", "WASHINGTON", "WAYNE", "WILSON") ~ 1,
+    county_desc %in% c("WAKE") ~ 2,
+    county_desc %in% c("BEAUFORT", "CAMDEN", "CARTERET", "CHOWAN", "CRAVEN", "CURRITUCK", "DARE", "DUPLIN", "HYDE", "JONES", "LENOIR", "ONSLOW", "PAMLICO", "PASQUOTANK", "PERQUIMANS", "PITT_2", "TYRRELL") ~ 3,
+    county_desc %in% c("CHATHAM", "DURHAM", "FRANKLIN", "GRANVILLE", "ORANGE", "VANCE_2", "WAKE_2") ~ 4,
+    county_desc %in% c("ALEXANDER", "ALLEGHANY", "ASHE", "BURKE", "CALDWELL", "CATAWBA", "CLEVELAND", "GASTON", "RUTHERFORD", "WATAUGA", "WILKES") ~ 5,
+    county_desc %in% c("FORSYTH", "GUILFORD") ~ 6,
+    county_desc %in% c("BLADEN", "BRUNSWICK", "COLUMBUS", "HARNETT", "JOHNSTON", "NEW HANOVER", "PENDER", "SAMPSON") ~ 7,
+    county_desc %in% c("CABARRUS", "CUMBERLAND", "HARNETT_2", "LEE", "MONTGOMERY", "MOORE", "STANLY") ~ 8,
+    county_desc %in% c("ANSON", "HOKE", "MECKLENBURG", "MOORE_2", "RICHMOND", "ROBESON", "SCOTLAND", "UNION") ~ 9,
+    county_desc %in% c("CATAWBA_2", "FORSYTH_2", "IREDELL", "LINCOLN", "ROCKINGHAM", "STOKES", "SURRY", "YADKIN") ~ 10,
+    county_desc %in% c("AVERY", "BUNCOMBE", "CHEROKEE", "CLAY", "GRAHAM", "HAYWOOD", "HENDERSON", "JACKSON", "MACON", "MADISON", "MCDOWELL", "MITCHELL", "POLK", "RUTHERFORD_2", "SWAIN", "TRANSYLVANIA", "YANCEY") ~ 11,
+    county_desc %in% c("MECKLENBURG_2") ~ 12,
+    county_desc %in% c("ALAMANCE", "CASWELL", "CHATHAM_2", "DAVIDSON", "DAVIE", "IREDELL_2", "LEE_2", "PERSON", "RANDOLPH", "ROWAN") ~ 13
+  )
+)
+```
+
+
+```{r}
+# Change election_lbl to be binary presidential or not
+modeling_data_split <- modeling_data_split %>% mutate(
+  presidential = case_when(
+    election_lbl == "11/06/2018" ~ 0,
+    election_lbl == "11/08/2016" ~ 1
+  )
+)
+validation_data <- validation_data %>% mutate(
+  presidential = case_when(
+    election_lbl == "11/04/2014" ~ 0,
+    election_lbl == "11/06/2012" ~ 1
+  )
+)
+```
+
+```{r}
+# Take a random sample of the data before running
+modeling_data_sample <- modeling_data_split %>% group_by(congressional_dist) %>% sample_n(250)
+```
+
+
+```{r}
+# Fit lmer model for binomial
+# Also look at hunter's commits when you're done
+model.basic <- glmer(n/n_registered ~ 1 + race_code + gender_code + ethnic_code + age_group + presidential + (1 + race_code + gender_code + ethnic_code + age_group + presidential|congressional_dist),
+                     data = modeling_data_sample, weights = n_registered,
+                     family = "binomial")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

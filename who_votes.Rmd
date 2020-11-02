@@ -3,8 +3,6 @@ title: "Who Votes?"
 author: "Ashley Murray, Hunter Gregory, Matty Pahren, Nathan O'Hara, Scott Heng"
 date: "10/20/2020"
 output:
-  html_document:
-    df_print: paged
   pdf_document:
     latex_engine: xelatex
 ---

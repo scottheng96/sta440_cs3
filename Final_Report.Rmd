@@ -7,6 +7,12 @@ output: pdf_document
 
 # Introduction
 
+Forecasting elections is of great interest, as politicians might election outcome models to adjust campaign strategies, economists might use it to predict how markets will react, and citizens might use it to decide whether to vote. The 2020 election is one of great importance, and it has seemingly gained even more attention that past elections. 
+
+In this report, we seek to model predicting the outcomes of several key races, specifically the presidental race, the US senate races, with special attention to the North Carolina senate race, and the North Carolina House race. First, we will describe our methods for all of the models, including a model of who votes in North Carolina, which aims to better the predictive power of our NC senate and House models. Next, we will discuss the results of our models. After that, we will walk through some of the limitations of our models. Finally, the appendices will include more detailed information about our modeling procedures and the data sources used. 
+
+<!-- Do we need lit review/data sections? Amy didn't explcitly mention it -->
+
 # Methods 
 <!-- modeling and prediction strategy along with the models themselves -->
 
@@ -34,9 +40,29 @@ output: pdf_document
 # Discussion
 <!-- evaluation of the relative predictive ability of variables in your models as well as discussion of strengths and weaknesses of your strategy.  -->
 
-# Appendix A
+# Appendix A: Models Used
 <!-- Numbered list of all models/modeling procedures, with explicit details about model purpose, model structure (models written out using equations!), and resulting estimates from each model (raw output is fine for this appendix). Reproducible code and data should also be uploaded to Sakai. -->
 
-# Appendix B
+## Who Votes Model
+
+## Electoral College Model
+*Describe Linzer model in more detail?*
+The purpose of this model is to predict the outcome of the presidential election by looking at electoral college votes. The probability of Trump winning is calculated by looking at the percentage of times in our 1500 *check number* simulations Trump gets 270 or more electoral college votes. In modeling the overall outcome of the presidential election, this model also predicts how each state's electoral college vote will go. Each state's electoral college outcome is modeled by looking at polling data from fivethirtyeight for that state in order to predict what percent of the popular vote both Trump and Biden receieve. Whichever candidate receives a larger percentage of the popular vote receives all of the electoral votes for that state. In reality, Maine and Nebraska can have split electoral college votes instead of the all-or-nothing approach other states take, but we chose to also model these states as all-or-nothing for simplicity sake, and many other election modelers take this same approach *possibly add citation?*. 
+
+*add Beta estimates/ JAGS output for all 50 states*
+
+## US Senate Model
+*Describe Linzer model in more detail?*
+
+Similar to our electoral college model, this model looks at senate race polling data from fivethirtyeight in order to predict the outcome of all current US senate races. The data was filtered to only include general election polling data, so in other words all jungle primary or runoff election polls were removed. Additionally, the data was filtered to only include polls less than a year out from the election. Lastly, polling data for third-parties was filtered out with one exception. Ricky Dale Harrington was an independent, but he was recoded to be a Democrat in our dataset. We did this because the few independents currently in Congress lately tend to vote with Democrats, and he was the only Independent in the dataset that was predicted to get a majority of votes in one of these senate races. After filtering, we were left with data for all states where senate elections were being held except for Arkansas, Rhode Island, South Dakota, West Virginia, Wyoming, Louisiana, and the second Georgia Race. However, most of these races were predicted to be blowout races, with Arkansas, South Dakota, West Virginia, Wyoming, and Louisiana deemed as safely Republican and Rhode Island deemed safe Democrat. Since this is the case, we counted these states as a corresponding Republican or Democratic win in each of our simulations. Georgia was the only race we were missing data for that seemed close, but we chose to use the Georgia predictions generated from the other Georgia race we did have data on, since senators are elected by the whole state and it is likely that the same people are voting for both senators. After making predictions for each individual race, we aggregate the results and look at the percentage of times where Republicans win more than 21 seats, where 21 is the number of seats Rebulicans need to win in order to have a 50/50 Republican/Democrat split in the senate. 
+
+*add Beta estimates/ JAGS output*
+
+## North Carolina Senate Model
+
+## North Carolina House Model
+
+
+# Appendix B: Data Sources 
 <!-- List of all data sets/data sources used, along with an explicit mapping from the models in Appendix A to the variables used from Appendix B in each model. -->
 
