@@ -20,8 +20,6 @@ voters$voter_reg_num <- as.integer(voters$voter_reg_num)
 voters_history <- merge(voters, his, by=c("voter_reg_num", "county_id")) #need to fix this line, dunno what happening
 ```
 
-
-
 ```{r}
 voters_history <- voters_history %>% mutate(
   year_at_election = as.numeric(format(as.Date(election_lbl, "%m/%d/%Y"), "%Y"))
@@ -43,8 +41,60 @@ voters_history <- voters_history %>% mutate(
 )
 ```
 
+```{r warning=F}
+voters_history_temp <- voters_history %>%
+  mutate(cong_dist_abbrv = as.character(cong_dist_abbrv)) %>%
+  mutate(cong_dist = case_when(is.na(cong_dist_abbrv) && county_desc.x %in% c("BERTIE", "EDGECOMBE", "GATES", "GREENE", "HALIFAX", "HERTFORD", "MARTIN", "NASH", "NORTHAMPTON", "WARREN", "WASHINGTON", "WAYNE", "WILSON") ~ 1,
+   is.na(cong_dist_abbrv) && county_desc.x %in% c("BEAUFORT", "CAMDEN", "CARTERET", "CHOWAN", "CRAVEN", "CURRITUCK", "DARE", "DUPLIN", "HYDE", "JONES", "LENOIR", "ONSLOW", "PAMLICO", "PASQUOTANK", "PERQUIMANS", "TYRRELL") ~ 3,
+                                is.na(cong_dist_abbrv) && county_desc.x %in% c("FRANKLIN", "GRANVILLE", "ORANGE") ~ 4,
+                                is.na(cong_dist_abbrv) && county_desc.x %in% c("BURKE", "CLEVELAND", "GASTON", "ALEXANDER", "ALLEGHANY", "ASHE", "CALDWELL", "WILKES", "WATAUGA") ~ 5,
+                                is.na(cong_dist_abbrv) %% county_desc.x %in% c("GUILFORD") ~ 6,
+                                is.na(cong_dist_abbrv) && county_desc.x %in% c("BRUNSWICK", "BLADEN", "COLUMBUS", "SAMPSON", "NEW HANOVER", "PENDER", "JOHNSTON") ~ 7,
+                                is.na(cong_dist_abbrv) && county_desc.x %in% c("CABARRUS", "STANLY", "MONTGOMERY", "CUMBERLAND") ~ 8,
+                                is.na(cong_dist_abbrv) && county_desc.x %in% c("HOKE", "MOORE", "ANSON", "UNION", "SCOTLAND", "ROBESON", "RICHMOND") ~ 9,
+                                is.na(cong_dist_abbrv) && county_desc.x %in% c("ROCKINGHAM", "STOKES", "SURRY", "YADKIN", "LINCOLN") ~ 10,
+                                is.na(cong_dist_abbrv) && county_desc.x %in% c("AVERY", "POLK", "CHEROKEE", "CLAY", "GRAHAM", "HAYWOOD", "HENDERSON", "JACKSON", "YANCEY", "TRANSYLVANIA", "SWAIN", "MACON", "MADISON", "MCDOWELL", "MITCHELL", "BUNCOMBE") ~ 11,
+                                is.na(cong_dist_abbrv) && county_desc.x %in% c("ALAMANCE", "CASWELL", "PERSON", "RANDOLPH", "DAVIDSON", "DAVIE", "ROWAN") ~ 13,
+                  !is.na(cong_dist_abbrv) ~ as.double(cong_dist_abbrv)))
+```
+
 ```{r}
-voters_history_condensed <- voters_history %>% group_by(race_code, gender_code, ethnic_code, age_group, county_desc.x, election_lbl) %>% summarise(n = n())
+voters_history <- voters_history %>%
+  mutate(cong_dist = case_when( county_desc.x %in% c("BERTIE", "EDGECOMBE", "GATES", "GREENE", "HALIFAX", "HERTFORD", "MARTIN", "NASH", "NORTHAMPTON", "WARREN", "WASHINGTON", "WAYNE", "WILSON") ~ 1,
+                                county_desc.x %in% c("BEAUFORT", "CAMDEN", "CARTERET", "CHOWAN", "CRAVEN", "CURRITUCK", "DARE", "DUPLIN", "HYDE", "JONES", "LENOIR", "ONSLOW", "PAMLICO", "PASQUOTANK", "PERQUIMANS", "TYRRELL") ~ 3,
+                                county_desc.x %in% c("FRANKLIN", "GRANVILLE", "ORANGE") ~ 4,
+                                county_desc.x %in% c("BURKE", "CLEVELAND", "GASTON", "ALEXANDER", "ALLEGHANY", "ASHE", "CALDWELL", "WILKES", "WATAUGA") ~ 5,
+                                county_desc.x %in% c("BRUNSWICK", "COLUMBUS", "SAMPSON", "NEW HANOVER", "PENDER") ~ 7,
+                                county_desc.x %in% c("CABARRUS", "STANLY", "MONTGOMERY") ~ 8,
+                                county_desc.x %in% c("HOKE", "MOORE", "ANSON", "UNION", "SCOTLAND", "ROBESON", "RICHMOND") ~ 9,
+                                county_desc.x %in% c("ROCKINGHAM", "STOKES", "SURRY", "YADKIN", "LINCOLN") ~ 10,
+                                county_desc.x %in% c("AVERY", "POLK", "CHEROKEE", "CLAY", "GRAHAM", "HAYWOOD", "HENDERSON", "JACKSON", "YANCEY", "TRANSYLVANIA", "SWAIN", "MACON", "MADISON", "MCDOWELL", "MITCHELL") ~ 11,
+                                county_desc.x %in% c("ALAMANCE", "CASWELL", "PERSON", "RANDOLPH", "DAVIDSON", "DAVIE") ~ 13))
+
+voters_history <- voters_history %>%
+  mutate(congressional_district = coalesce(cong_dist, cong_dist_abbrv))
+```
+
+```{r}
+voters_history_temp <- voters_history %>%
+  mutate(cong_dist = as.character(cong_dist)) %>%
+  mutate(cong_dist = case_when(is.na(congressional_district) && county_desc.x %in% c("BERTIE", "EDGECOMBE", "GATES", "GREENE", "HALIFAX", "HERTFORD", "MARTIN", "NASH", "NORTHAMPTON", "WARREN", "WASHINGTON", "WAYNE", "WILSON") ~ 1,
+   is.na(congressional_district) && county_desc.x %in% c("BEAUFORT", "CAMDEN", "CARTERET", "CHOWAN", "CRAVEN", "CURRITUCK", "DARE", "DUPLIN", "HYDE", "JONES", "LENOIR", "ONSLOW", "PAMLICO", "PASQUOTANK", "PERQUIMANS", "TYRRELL") ~ 3,
+                                is.na(congressional_district) && county_desc.x %in% c("FRANKLIN", "GRANVILLE", "ORANGE") ~ 4,
+                                is.na(congressional_district) && county_desc.x %in% c("BURKE", "CLEVELAND", "GASTON", "ALEXANDER", "ALLEGHANY", "ASHE", "CALDWELL", "WILKES", "WATAUGA") ~ 5,
+                                is.na(congressional_district) %% county_desc.x %in% c("GUILFORD") ~ 6,
+                                is.na(congressional_district) && county_desc.x %in% c("BRUNSWICK", "BLADEN", "COLUMBUS", "SAMPSON", "NEW HANOVER", "PENDER", "JOHNSTON") ~ 7,
+                                is.na(congressional_district) && county_desc.x %in% c("CABARRUS", "STANLY", "MONTGOMERY", "CUMBERLAND") ~ 8,
+                                is.na(congressional_district) && county_desc.x %in% c("HOKE", "MOORE", "ANSON", "UNION", "SCOTLAND", "ROBESON", "RICHMOND") ~ 9,
+                                is.na(congressional_district) && county_desc.x %in% c("ROCKINGHAM", "STOKES", "SURRY", "YADKIN", "LINCOLN") ~ 10,
+                                is.na(congressional_district) && county_desc.x %in% c("AVERY", "POLK", "CHEROKEE", "CLAY", "GRAHAM", "HAYWOOD", "HENDERSON", "JACKSON", "YANCEY", "TRANSYLVANIA", "SWAIN", "MACON", "MADISON", "MCDOWELL", "MITCHELL", "BUNCOMBE") ~ 11,
+                                is.na(congressional_district) && county_desc.x %in% c("ALAMANCE", "CASWELL", "PERSON", "RANDOLPH", "DAVIDSON", "DAVIE", "ROWAN") ~ 13,
+                  !is.na(congressional_district) ~ congressional_district)) %>%
+  mutate(cong_dist = as.factor(cong_dist))
+```
+
+```{r}
+voters_history_condensed <- voters_history %>% group_by(race_code, gender_code, ethnic_code, age_group, county_desc.x, election_lbl, congressional_district, voted_party_desc) %>% summarise(n = n())
 ```
 
 ```{r}
