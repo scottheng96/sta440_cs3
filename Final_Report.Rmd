@@ -1,7 +1,7 @@
 ---
 title: "Election Prediction Report"
 author: "Ashley Murray, Hunter Gregory, Matty Pahren, Nathan O'Hara, Scott Heng"
-date: "10/29/2020"
+date: "11/3/2020"
 output: pdf_document
 ---
 
@@ -236,8 +236,11 @@ Another prominent limitation in our Linzer models is that is a consequence of th
 
 # Bibliography
 [1] 2020 Senate Election Interactive Map. (n.d.). Retrieved from https://www.270towin.com/2020-senate-election/
+
 [2] 1918 Pandemic (H1N1 virus). (2019, March 20). Retrieved from https://www.cdc.gov/flu/pandemic-resources/1918-pandemic-h1n1.html#:~:text=The 1918 influenza pandemic was,spread worldwide during 1918-1919
+
 [3] 2016 United States Senate election in North Carolina. (2020, July 31). Retrieved from https://en.wikipedia.org/wiki/2016_United_States_Senate_election_in_North_Carolina
+
 [4] 2016 United States House of Representatives elections in North Carolina. (2020, August 16). Retrieved from https://en.wikipedia.org/wiki/2016_United_States_House_of_Representatives_elections_in_North_Carolina
 
 
@@ -277,7 +280,7 @@ We only consider polls ending 200 days or less before the election. We include p
 
 ### Estimates From Model
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning = F, messge = F}
 
 pres <- read.csv(file = "data/president_polls.csv") 
 
@@ -354,7 +357,7 @@ model <- function(){
 }
 ```
 
-```{r run_model,eval=TRUE, echo = FALSE}
+```{r run_model,eval=TRUE, echo = FALSE, message = F, warning = F}
 #be sure to add your added parameters to parameters.to.save
 set.seed(13)
 jags_sims_trump <- jags(data = jags_data_trump,
@@ -419,7 +422,7 @@ jags_sims_trump <- jags(data = jags_data_trump,
 ```
 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning = F, message = F}
 jags_r <- jags_sims_trump
 b1r <- jags_r$BUGSoutput$sims.array[1:1500]
 b10r <- jags_r$BUGSoutput$sims.array[1501:3000]
@@ -566,7 +569,7 @@ This model predicts the probability that the senate will remain in Republican co
 This model is identical to that for the electoral college, except only a subset of the states and we consider polls ending 364 days or less before the election.
 
 ### Estimates From Model
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning = F, message = F}
 
 senate_polls <- read.csv(file='data/senate_polls.csv')
 senate_polls <- senate_polls %>%
@@ -641,7 +644,7 @@ model <- function(){
 ```
 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning = F, message = F}
 set.seed(1)
 jags_r <- jags(data = jags_data_republican,
                   model.file = model,
@@ -766,7 +769,7 @@ and \ \epsilon_{i} \sim N(0, \sigma^2)
 We calculated the overall Republican share for all districts simply as $$Tillis = \sum_{j=1}^{13} Republican \ District_{j}$$. Tillis was considered to win the election if $Tillis > 0.5$.
 
 ### Estimates From Model
-```{r, echo = F}
+```{r, echo = F, warning = F, message = F}
 # linear mixed model with random effect for county
 M3 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 +  incumbent_party + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2018, control = lmerControl(optimizer ="Nelder_Mead"))
 
@@ -816,7 +819,7 @@ $$Republican \ District_{j} = \sum_{i \in counties_j} t^*_i $$
 where $counties_j$ is the set of counties in district $j$, and $t^*_i = \frac{t_i}{2 I(split_i)}$, where $t_i$ is the total number of voters in county $i$, $I$ is the indicator function, and $split_i$ is a boolean of whether county $i$ is divided into two districts. Each split county was examined individually and looked geographically split in half for each district, so dividing the total by 2 is a reasonable approximation we can make with our given data. The Republican was considered to win the district if $Republican \ District_{j} > 0.5$.
 
 ### Estimates From Model
-```{r, echo = FALSE}
+```{r, echo = FALSE, message = F, warning = F}
 # estimate percentages across whole state
 
 M4 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2018, control = lmerControl(optimizer ="Nelder_Mead"))
@@ -846,11 +849,13 @@ modified_counties %>%
 ```
 
 # Appendix B: Data Sources 
-NC Voter Data: 
+NC Voter Data: (https://dl.ncsbe.gov/?prefix=data/) 
+
 Used in North Carolina House Model and Who Votes in North Carolina Model
 Variables used: % of people registered as Republicans in 2016 and 2018
-Used in Who Votes model???
-https://dl.ncsbe.gov/?prefix=data/
+
+Used in Who Votes model
+
 
 Mapping for Who Votes:
 ```{r fig.align="center", echo=FALSE, warning=FALSE}
@@ -885,35 +890,43 @@ features_tbl %>%
 ```
 
 
-Census Data: Neighborhood characteristics by county in North Carolina 
+Census Data: (https://opportunityinsights.org/data/?geographic_level=0&topic=0&paper_id=0#resource-listingNeighborhood)
+
+Characteristics by county in North Carolina. 
 Used in North Carolina House and Senate Models
 Variables used: percentage of people who live 15 minutes away from where they work in a given county (2010),  percentage of people who are foreign-born in a given county (2010), the percentage of single parents in a given county (2010), the percentage of people who have at least some college education in a given county (2010), the percentage of people living below the poverty line in a given county (2010), the average rent of a two-bedroom apartment in the county (2015), the average annual job growth from 2004-2013, the share of the population that is white, black, asian, and hispanic (2010)
-https://opportunityinsights.org/data/?geographic_level=0&topic=0&paper_id=0#resource-listing
 
-Ballotpedia: 
+
+Ballotpedia: (https://ballotpedia.org/United_States_House_of_Representatives_elections_in_North_Carolina,_2020)
+
 Used in North Carolina House Model
 Variables used: Incumbent Party for NC Congressional Races
-https://ballotpedia.org/United_States_House_of_Representatives_elections_in_North_Carolina,_2020
 
-North Carolina County Data: 
+
+North Carolina County Data: (http://speakermoore.com/new-n-c-congressional-districts-approved-state-house-representatives/)
+
 Used in North Carolina House and Senate Models
 Variables used: What district all the counties in North Carolina are a part of
-http://speakermoore.com/new-n-c-congressional-districts-approved-state-house-representatives/
 
-North Carolina 2016 Election Data: 
+
+North Carolina 2016 Election Data: (https://en.wikipedia.org/wiki/2016_United_States_presidential_election_in_North_Carolina#:~:text=The%202016%20United%20States%20presidential,of%20the%202016%20general%20election.)
+
 Used in North Carolina House and Senate Models
 Variables used: Total number of voters by county in 2016 presidential election
-https://en.wikipedia.org/wiki/2016_United_States_presidential_election_in_North_Carolina#:~:text=The%202016%20United%20States%20presidential,of%20the%202016%20general%20election.
+
 
 Fivethirtyeight senate polling data
+
 Used for model building (2020) and validation (2018) in US Senate Model
 Variables used: days until election, polling state, candidate party, percentage of support in poll
 
 Fivethirtyeight presidential polling data
+
 Used for model building in Electoral College Model
 Variables used: days until election, polling state, candidate party, percentage of support in poll
 
 2016 Economist Presidential Polling Data
+
 Used as validation for the Electoral College Model
 Variables used: days until election, polling state, candidate party, percentage of support in poll
 
@@ -1010,7 +1023,7 @@ qqnorm(residuals(M3))
 # Appendix D: Out-of-Sample Validation
 
 ## Electoral College - 2016 Election
-```{r, echo = FALSE, include = F}
+```{r, echo = FALSE, include = F, message = F, include = F}
 set.seed(2016)
 polls <- read_csv("data/2016_Economist_Polls.csv") %>% 
   filter(population %in% c("Likely Voters","Registered Voters"),question.iteration == 1) %>% #remove duplicate questions
@@ -1125,7 +1138,6 @@ jags_r$BUGSoutput
 
 
 ```{r, echo = FALSE, include = F}
-elec_votes_r <- c(9,9,3,6,11,55,9,7,3,29,16,4,4,20,11,6,8,8,4,10,11,16,10,6,10,3,15,3,4,14,5,6,6,29,3,18,7,7,20,4,9,3,11,38,6,13,3,12,10,5,3)
 
 b1r <- jags_r$BUGSoutput$sims.array[1:1500]
 b10r <- jags_r$BUGSoutput$sims.array[1501:3000]
@@ -1249,13 +1261,8 @@ clinton_electoral
 
 ## US Senate - 2018 Election
 
-```{r, echo = FALSE, include = FALSE}
+```{r, echo = FALSE, include = FALSE, message = F, warning = F}
 # 35 seats up 
-
-s <- read.csv(file='data/senate_polls.csv')
-s <- s %>%
-  filter(cycle == 2018) %>%
-  filter(stage != "general")
 
 senate_polls <- read.csv(file='data/senate_polls.csv')
 senate_polls <- senate_polls %>%
@@ -1333,7 +1340,7 @@ model <- function(){
 
 
 
-```{r, echo = F, include = F}
+```{r, echo = F, include = F, message = F, warning = F}
 set.seed(1)
 jags_r <- jags(data = jags_data_republican,
                   model.file = model,
@@ -1383,14 +1390,7 @@ jags_r$BUGSoutput
 ```
 
 
-```{r, echo = FALSE, inlcude = F}
-senate_1 <- read.csv(file='data/senate_polls.csv')
-senate_1 %>%
-  filter(question_id == 86679 | question_id == 91111 | question_id == 90518 | question_id == 90510 | question_id == 90151 | question_id == 85923)
-```
-
-
-```{r, echo = FALSE, include = F}
+```{r, echo = FALSE, include = F, message = F, warning = F}
 w1 = ifelse(b1r > 50, 1, 0)
 w2 = ifelse(b2r > 50, 1, 0)
 w3 = ifelse(b3r > 50, 1, 0)
