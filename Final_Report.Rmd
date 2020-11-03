@@ -566,8 +566,8 @@ trump_electoral
 jags_r$BUGSoutput
 ```
 
-```{r}
-max_day = 120 # TODO modify (max for plotting/saving parameters)
+```{r, echo = FALSE, warning = F, message = F}
+max_day = 60 # TODO modify (max for plotting/saving parameters)
 beta_j_strings = paste0('beta[', seq(1, length(states)), ',')
 all_beta_strings = c()
 for (beta_j_string in beta_j_strings) {
@@ -586,7 +586,7 @@ beta_plot_data <- lapply(1:N_states,function(st){
 }) %>% 
   bind_rows()
 
-good_states = states[1:length*states] # TODO modify to plot less things
+good_states = states[1:length(states)] # TODO modify to plot less things
 
 left_join(beta_plot_data,poll_plot_data) %>% 
   filter(state %in% good_states) %>%

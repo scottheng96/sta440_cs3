@@ -89,7 +89,7 @@ model <- function(){
   nu_beta ~ dunif(0,100)
   tau_beta ~ dunif(0,100)
   
-  mu0 ~ dnorm(50,pow(7.5,-2))
+  mu0 ~ dnorm(50,pow(15,-2))
   sigma2_0 = 1/sigma2_0_inv
   sigma2_0_inv ~ dgamma(.5,.5)
 }
