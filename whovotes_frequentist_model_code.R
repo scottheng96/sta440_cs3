@@ -45,12 +45,7 @@ modeling_data_split <- modeling_data_split %>% mutate(
     election_lbl == "11/08/2016" ~ 1
   )
 )
-validation_data <- validation_data %>% mutate(
-  presidential = case_when(
-    election_lbl == "11/04/2014" ~ 0,
-    election_lbl == "11/06/2012" ~ 1
-  )
-)
+
 # Need to group it by cong dist
 modeling_data_split <- modeling_data_split %>% group_by(race_code, sex_code, ethnic_code, age_group, party_cd, gender_code, congressional_dist, presidential) %>% summarise(n = sum(n), n_registered = sum(n_registered))
 modeling_data_sample <- modeling_data_split[sample(nrow(modeling_data_split), 5000),]
