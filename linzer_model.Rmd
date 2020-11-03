@@ -215,6 +215,10 @@ b53r <- jags_r$BUGSoutput$sims.array[75001:76500]
 b54r <- jags_r$BUGSoutput$sims.array[76501:78000]
 b55r <- jags_r$BUGSoutput$sims.array[78001:79500]
 b56r <- jags_r$BUGSoutput$sims.array[79501:81000]
+b6r <- jags_r$BUGSoutput$sims.array[81001:82500]
+b7r <- jags_r$BUGSoutput$sims.array[82501:84000]
+b8r <- jags_r$BUGSoutput$sims.array[84001:85500]
+b9r <- jags_r$BUGSoutput$sims.array[85501:87000]
 
 w1 = ifelse(b1r > 50, 6, 0) #IA
 w2 = ifelse(b2r > 50, 20, 0) #PA
