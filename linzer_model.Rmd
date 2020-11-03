@@ -215,6 +215,11 @@ jags_r <- jags(data = jags_data,model.file = model,parameters.to.save = c("beta"
 
 
 ```{r}
+jags_r$BUGSoutput
+```
+
+
+```{r}
 elec_votes_r <- c(9,9,3,6,11,55,9,7,3,29,16,4,4,20,11,6,8,8,4,10,11,16,10,6,10,3,15,3,4,14,5,6,6,29,3,18,7,7,20,4,9,3,11,38,6,13,3,12,10,5,3)
 
 b1r <- jags_r$BUGSoutput$sims.array[1:1500]
