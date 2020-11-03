@@ -108,14 +108,32 @@ modeling_data_sample <- modeling_data_split[sample(nrow(modeling_data_split), 50
 
 ```{r}
 # Fit lmer model for binomial
-# Also look at hunter's commits when you're done
 model.basic <- glmer(n/n_registered ~ 1 + race_code + gender_code + ethnic_code + age_group + party_cd + presidential + (1 + race_code + gender_code + ethnic_code + age_group + party_cd + presidential|congressional_dist),
                      data = modeling_data_sample, weights = n_registered,
                      family = "binomial")
-# Started running: 5:38 pm
+# Started running: 6:50 pm
 ```
 
 
+```{r}
+summary(model.basic)
+```
+
+
+```{r}
+# Fit lmer model for binomial
+library(optimx)
+optimx.model <- glmer(n/n_registered ~ 1 + race_code + gender_code + ethnic_code + age_group + party_cd + presidential + (1 + race_code + gender_code + ethnic_code + age_group + party_cd + presidential|congressional_dist),
+                     data = modeling_data_sample, weights = n_registered,
+                     family = "binomial", control = glmerControl(optimizer ='optimx', optCtrl=list(method='nlminb')))
+# Started running: 8:37 pm
+```
+
+
+
+```{r}
+
+```
 
 
 
