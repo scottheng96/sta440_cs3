@@ -15,40 +15,40 @@ library(R2jags)
 ```
 
 ```{r}
-s <- read.csv(file='data/senate_polls.csv')
-s <- s %>%
-  filter(cycle == 2020) %>%
-  filter(stage != "general")
 
 senate_polls <- read.csv(file='data/senate_polls.csv')
 senate_polls <- senate_polls %>%
   mutate(days_to_election = as.Date(as.character(election_date), format ="%m/%d/%Y")-as.Date(as.character(start_date), format = "%m/%d/%Y")) %>%
   filter(cycle == 2020) %>%
-  mutate(race_id = case_when(as.double(race_id) == 7787 ~ 6277,
-                   TRUE ~ as.double(race_id))) %>%
-  mutate(race_id = case_when(as.double(race_id) == 7781 ~ 7780,
-                             TRUE ~ as.double(race_id))) %>%
   filter(stage != "jungle primary") %>%
   filter(stage != "runoff") %>%
   filter(days_to_election <= 365) %>%
-  mutate(candidate_party = case_when(candidate_name == "Ricky Dale Harrington" ~ "DEM",
-                                     TRUE ~ candidate_party))
+  filter(state != "Arkansas") %>%
+  filter(candidate_party == "REP" | candidate_party == "DEM")%>%
+  mutate(days_to_election = as.numeric(days_to_election))
+
 
 polls_republican <- senate_polls %>%
-  filter(candidate_party=="REP") %>%
-  mutate(days_to_election = as.numeric(days_to_election))
+  filter(candidate_party=="REP") 
+r_pct = polls_republican$pct
+
 polls_not_republican <- senate_polls %>%
-  filter(candidate_party == "DEM")%>%
-  mutate(days_to_election = as.numeric(days_to_election))
+  filter(candidate_party == "DEM")
+d_pct = polls_not_republican$pct
+
+
+polls_republican$rep_pct = 100*r_pct/(r_pct + d_pct)
 ```
 
+
+
 ```{r}
-race_id <- polls_republican$race_id %>% unique
-y <- polls_republican$pct
-r <- match(polls_republican$race_id,race_id)
+state <- polls_republican$state %>% unique
+y <- polls_republican$rep_pct
+r <- match(polls_republican$state,state)
 t <- polls_republican$days_to_election + 1
 N_polls <- y %>% length
-N_states <- race_id %>% length
+N_states <- state %>% length
 N_days <- t %>% max
 jags_data_republican <- list(y=y,t=t,r=r,
                   N_polls=N_polls,N_states=N_states,N_days=N_days)
@@ -89,63 +89,6 @@ model <- function(){
 }
 ```
 
-```{r}
-#be sure to add your added parameters to parameters.to.save
-# jags_sims_republican <- jags(data = jags_data_republican,
-#                   model.file = model,
-#                   parameters.to.save = c("beta","sigma2_beta","p","sigma2_y"),
-#                   n.iter = 1000)
-```
-
-```{r}
-race_id <- polls_not_republican$race_id %>% unique
-y <- polls_not_republican$pct
-r <- match(polls_not_republican$race_id,race_id)
-t <- polls_not_republican$days_to_election + 1 #WHY PLUS ONE?
-N_polls <- y %>% length
-N_states <- race_id %>% length
-N_days <- t %>% max
-jags_data_not_republican <- list(y=y,t=t,r=r,
-                  N_polls=N_polls,N_states=N_states,N_days=N_days)
-
-model <- function(){
-  for(k in 1:N_polls){
-    y[k] ~ dnorm(p[k],1/sigma2_y[r[k]]) #note no longer binomial
-    p[k] = beta[r[k],t[k]] 
-  }
-  for(j in 2:N_days){
-    for(i in 1:N_states){
-      beta[i,j] ~ dnorm(beta[i,j-1],pow(sigma2_beta[i],-1))
-    }
-  }
-  
-  #EXERCISE: add hierarhciacl prior for sigma2_beta and sigma2_y, i.e. sigma2_beta[j] all come from a common distribution 
-  for(j in 1:N_states){
-      sigma2_y[j] = 1/sigma2_y_inv[j]
-      sigma2_y_inv[j] ~ dgamma(nu_y,nu_y*tau_y) 
-      
-      sigma2_beta[j] = 1/sigma2_beta_inv[j]
-      sigma2_beta_inv[j] ~ dgamma(nu_beta,nu_beta*tau_beta) 
-      
-      beta[j,1] ~ dnorm(mu0,pow(sigma2_0,-1))
-  }
-  nu_y ~ dunif(0,100)
-  tau_y ~ dunif(0,100)
-  
-  nu_beta ~ dunif(0,100)
-  tau_beta ~ dunif(0,100)
-  
-  mu0 ~ dnorm(50,pow(7.5,-2))
-  sigma2_0 = 1/sigma2_0_inv
-  sigma2_0_inv ~ dgamma(.5,.5)
-}
-
-# jags_sims_not_republican <- jags(data = jags_data_not_republican,
-#                   model.file = model,
-#                   parameters.to.save = c("beta","sigma2_beta","p","sigma2_y"),
-#                   n.iter = 1000)
-```
-
 
 ```{r}
 set.seed(1)
@@ -156,7 +99,7 @@ jags_r <- jags(data = jags_data_republican,
                                          "beta[11,1]", "beta[12,1]", "beta[13,1]", "beta[14,1]", "beta[15,1]",
                                          "beta[16,1]", "beta[17,1]", "beta[18,1]", "beta[19,1]", "beta[20,1]",
                                          "beta[21,1]", "beta[22,1]", "beta[23,1]", "beta[24,1]", "beta[25,1]",
-                                         "beta[26,1]", "beta[27,1]", "beta[28,1]", "beta[29,1]"),
+                                         "beta[26,1]", "beta[27,1]", "beta[28,1]", "beta[29,1]", "beta[30,1]"),
                   n.iter = 1000)
 
 b1r <- jags_r$BUGSoutput$sims.array[1:1500]
@@ -182,89 +125,54 @@ b27r <- jags_r$BUGSoutput$sims.array[28501:30000]
 b28r <- jags_r$BUGSoutput$sims.array[30001:31500]
 b29r <- jags_r$BUGSoutput$sims.array[31501:33000]
 b3r <- jags_r$BUGSoutput$sims.array[33001:34500]
-b4r <- jags_r$BUGSoutput$sims.array[34501:36000]
-b5r <- jags_r$BUGSoutput$sims.array[36001:37500]
-b6r <- jags_r$BUGSoutput$sims.array[37501:39000]
-b7r <- jags_r$BUGSoutput$sims.array[39001:40500]
-b8r <- jags_r$BUGSoutput$sims.array[40501:42000]
-b9r <- jags_r$BUGSoutput$sims.array[42001:43500]
-
-
-jags_d <- jags(data = jags_data_not_republican,
-                  model.file = model,
-                  parameters.to.save = c("beta[1,1]", "beta[2,1]", "beta[3,1]", "beta[4,1]", "beta[5,1]", 
-                                         "beta[6,1]", "beta[7,1]", "beta[8,1]", "beta[9,1]", "beta[10,1]",
-                                         "beta[11,1]", "beta[12,1]", "beta[13,1]", "beta[14,1]", "beta[15,1]",
-                                         "beta[16,1]", "beta[17,1]", "beta[18,1]", "beta[19,1]", "beta[20,1]",
-                                         "beta[21,1]", "beta[22,1]", "beta[23,1]", "beta[24,1]", "beta[25,1]",
-                                         "beta[26,1]", "beta[27,1]", "beta[28,1]", "beta[29,1]"),
-                  n.iter = 1000)
-
-b1d <- jags_d$BUGSoutput$sims.array[1:1500]
-b10d <- jags_d$BUGSoutput$sims.array[1501:3000]
-b11d <- jags_d$BUGSoutput$sims.array[3001:4500]
-b12d <- jags_d$BUGSoutput$sims.array[4501:6000]
-b13d <- jags_d$BUGSoutput$sims.array[6001:7500]
-b14d <- jags_d$BUGSoutput$sims.array[7501:9000]
-b15d <- jags_d$BUGSoutput$sims.array[9001:10500]
-b16d <- jags_d$BUGSoutput$sims.array[10501:12000]
-b17d <- jags_d$BUGSoutput$sims.array[12001:13500]
-b18d <- jags_d$BUGSoutput$sims.array[13501:15000]
-b19d <- jags_d$BUGSoutput$sims.array[15001:16500]
-b2d <- jags_d$BUGSoutput$sims.array[16501:18000]
-b20d <- jags_d$BUGSoutput$sims.array[18001:19500]
-b21d <- jags_d$BUGSoutput$sims.array[19501:21000]
-b22d <- jags_d$BUGSoutput$sims.array[21001:22500]
-b23d <- jags_d$BUGSoutput$sims.array[22501:24000]
-b24d <- jags_d$BUGSoutput$sims.array[24001:25500]
-b25d <- jags_d$BUGSoutput$sims.array[25501:27000]
-b26d <- jags_d$BUGSoutput$sims.array[27001:28500]
-b27d <- jags_d$BUGSoutput$sims.array[28501:30000]
-b28d <- jags_d$BUGSoutput$sims.array[30001:31500]
-b29d <- jags_d$BUGSoutput$sims.array[31501:33000]
-b3d <- jags_d$BUGSoutput$sims.array[33001:34500]
-b4d <- jags_d$BUGSoutput$sims.array[34501:36000]
-b5d <- jags_d$BUGSoutput$sims.array[36001:37500]
-b6d <- jags_d$BUGSoutput$sims.array[37501:39000]
-b7d <- jags_d$BUGSoutput$sims.array[39001:40500]
-b8d <- jags_d$BUGSoutput$sims.array[40501:42000]
-b9d <- jags_d$BUGSoutput$sims.array[42001:43500]
-
+b30r <- jags_r$BUGSoutput$sims.array[34501:36000]
+b4r <- jags_r$BUGSoutput$sims.array[36001:37500]
+b5r <- jags_r$BUGSoutput$sims.array[37501:39000]
+b6r <- jags_r$BUGSoutput$sims.array[39001:40500]
+b7r <- jags_r$BUGSoutput$sims.array[40501:42000]
+b8r <- jags_r$BUGSoutput$sims.array[42001:43500]
+b9r <- jags_r$BUGSoutput$sims.array[43501:45000]
 ```
 
 ```{r}
-w1 = ifelse(b1r > b1d, 1, 0)
-w2 = ifelse(b2r > b2d, 1, 0)
-w3 = ifelse(b3r > b3d, 1, 0)
-w4 = ifelse(b4r > b4d, 1, 0)
-w5 = ifelse(b5r > b5d, 1, 0)
-w6 = ifelse(b6r > b6d, 1, 0)
-w7 = ifelse(b7r > b7d, 1, 0)
-w8 = ifelse(b8r > b8d, 1, 0)
-w9 = ifelse(b9r > b9d, 1, 0)
-w10 = ifelse(b10r > b10d, 1, 0)
-w11 = ifelse(b11r > b11d, 1, 0)
-w12 = ifelse(b12r > b12d, 1, 0)
-w13 = ifelse(b13r > b13d, 1, 0)
-w14 = ifelse(b14r > b14d, 1, 0)
-w15 = ifelse(b15r > b15d, 1, 0)
-w16 = ifelse(b16r > b16d, 1, 0)
-w17 = ifelse(b17r > b17d, 1, 0)
-w18 = ifelse(b18r > b18d, 1, 0)
-w19 = ifelse(b19r > b19d, 1, 0)
-w20 = ifelse(b20r > b20d, 1, 0)
-w21 = ifelse(b21r > b21d, 1, 0)
-w22 = ifelse(b22r > b22d, 1, 0)
-w23 = ifelse(b23r > b23d, 1, 0)
-w24 = ifelse(b24r > b24d, 1, 0)
-w25 = ifelse(b25r > b25d, 1, 0)
-w26 = ifelse(b26r > b26d, 1, 0)
-w27 = ifelse(b27r > b27d, 1, 0)
-w28 = ifelse(b28r > b28d, 1, 0)
-w29 = ifelse(b29r > b29d, 1, 0)
-w30 = ifelse(b2r > b2d, 1, 0)
+jags_r$BUGSoutput
+```
 
-r_wins <- data.frame(cbind(w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14, w15, w16, w17, w18, w19, w20, w21, w22, w23, w24, w25, w26, w27, w28, w29, w30))
+
+```{r}
+w1 = ifelse(b1r > 50, 1, 0)
+w2 = ifelse(b2r > 50, 1, 0)
+w3 = ifelse(b3r > 50, 1, 0)
+w4 = ifelse(b4r > 50, 1, 0)
+w5 = ifelse(b5r > 50, 1, 0)
+w6 = ifelse(b6r > 50, 1, 0)
+w7 = ifelse(b7r > 50, 1, 0)
+w8 = ifelse(b8r > 50, 1, 0)
+w9 = ifelse(b9r > 50, 1, 0)
+w10 = ifelse(b10r > 50, 1, 0)
+w11 = ifelse(b11r > 50, 1, 0)
+w12 = ifelse(b12r > 50, 1, 0)
+w13 = ifelse(b13r > 50, 1, 0)
+w14 = ifelse(b14r > 50, 1, 0)
+w15 = ifelse(b15r > 50, 1, 0)
+w16 = ifelse(b16r > 50, 1, 0)
+w17 = ifelse(b17r > 50, 1, 0)
+w18 = ifelse(b18r > 50, 1, 0)
+w19 = ifelse(b19r > 50, 1, 0)
+w20 = ifelse(b20r > 50, 1, 0)
+w21 = ifelse(b21r > 50, 1, 0)
+w22 = ifelse(b22r > 50, 1, 0)
+w23 = ifelse(b23r > 50, 1, 0)
+w24 = ifelse(b24r > 50, 1, 0)
+w25 = ifelse(b25r > 50, 1, 0)
+w26 = ifelse(b26r > 50, 1, 0)
+w27 = ifelse(b27r > 50, 1, 0)
+w28 = ifelse(b28r > 50, 1, 0)
+w29 = ifelse(b29r > 50, 1, 0)
+w30 = ifelse(b30r > 50, 1, 0)
+w31 = ifelse(b3r > 50, 1, 0)
+
+r_wins <- data.frame(cbind(w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14, w15, w16, w17, w18, w19, w20, w21, w22, w23, w24, w25, w26, w27, w28, w29, w30, w31))
 
 n = nrow(r_wins)
 
@@ -272,21 +180,21 @@ n = nrow(r_wins)
 r_wins$total = rowSums(r_wins)
 
 #missing a few states, but these races aren't predicted to be close
-#ARKANSAS(R) #RHODE ISLAND(D) #SOUTH DAKOTA(R) #WEST VIRGINIA(R) #WYOMING(R) #LOUISIANA(R)
-# double Georgia
-# R + 5, need 21 total for split
-#16
+#RHODE ISLAND(D) #SOUTH DAKOTA(R) #LOUISIANA(R) # ARKANSAS(R) #double Georgia
+# R + 3, need 21 total for split
+#18
 
 repub_senate <- r_wins%>%
-  filter(total > 16) %>%
+  filter(total > 18) %>%
   summarise(perc = n()/nrow(r_wins)) %>%
   pull()
 
 repub_senate
 
+hist(r_wins$total)
 ```
 
-# Validation on 2018 senate race
+# Validation on 2018 senate race WITH STANDARDIZATION
 ```{r}
 # 35 seats up 
 
@@ -589,4 +497,208 @@ plot(jags_r,ask = FALSE)
 plot(jags_d,ask = FALSE)
 ```
 
+# Validation on 2018 senate race
+```{r}
+# 35 seats up 
 
+s <- read.csv(file='data/senate_polls.csv')
+s <- s %>%
+  filter(cycle == 2018) %>%
+  filter(stage != "general")
+
+senate_polls <- read.csv(file='data/senate_polls.csv')
+senate_polls <- senate_polls %>%
+  mutate(days_to_election = as.Date(as.character(election_date), format ="%m/%d/%Y")-as.Date(as.character(start_date), format = "%m/%d/%Y")) %>%
+  filter(cycle == 2018) %>%
+  filter(race_id != 97) %>% # 2 democrats running?
+  mutate(candidate_party = case_when(candidate_name == "Bernard Sanders" ~ "DEM",
+                                     candidate_name == "Angus S. King Jr." ~ "DEM",
+                                     TRUE ~ candidate_party)) %>% # made them democrat so numbers would line up, he often votes with Democrats on issues
+  filter(stage != "jungle primary") %>%
+  filter(stage != "runoff") %>%
+  filter(days_to_election <= 365)%>%
+  filter(candidate_party == "REP" | candidate_party == "DEM")%>%
+  mutate(days_to_election = as.numeric(days_to_election))
+
+
+polls_republican <- senate_polls %>%
+  filter(candidate_party=="REP") 
+r_pct = polls_republican$pct
+
+polls_not_republican <- senate_polls %>%
+  filter(candidate_party == "DEM")
+d_pct = polls_not_republican$pct
+
+
+polls_republican$rep_pct = 100*r_pct/(r_pct + d_pct)
+```
+
+```{r}
+state <- polls_republican$state %>% unique
+y <- polls_republican$rep_pct
+r <- match(polls_republican$state,state)
+t <- polls_republican$days_to_election + 1
+N_polls <- y %>% length
+N_states <- state %>% length
+N_days <- t %>% max
+jags_data_republican <- list(y=y,t=t,r=r,
+                  N_polls=N_polls,N_states=N_states,N_days=N_days)
+
+```
+
+```{r}
+model <- function(){
+  for(k in 1:N_polls){
+    y[k] ~ dnorm(p[k],1/sigma2_y[r[k]]) #note no longer binomial
+    p[k] = beta[r[k],t[k]] 
+  }
+  for(j in 2:N_days){
+    for(i in 1:N_states){
+      beta[i,j] ~ dnorm(beta[i,j-1],pow(sigma2_beta[i],-1))
+    }
+  }
+  
+  #EXERCISE: add hierarhciacl prior for sigma2_beta and sigma2_y, i.e. sigma2_beta[j] all come from a common distribution 
+  for(j in 1:N_states){
+      sigma2_y[j] = 1/sigma2_y_inv[j]
+      sigma2_y_inv[j] ~ dgamma(nu_y,nu_y*tau_y) 
+      
+      sigma2_beta[j] = 1/sigma2_beta_inv[j]
+      sigma2_beta_inv[j] ~ dgamma(nu_beta,nu_beta*tau_beta) 
+      
+      beta[j,1] ~ dnorm(mu0,pow(sigma2_0,-1))
+  }
+  nu_y ~ dunif(0,100)
+  tau_y ~ dunif(0,100)
+  
+  nu_beta ~ dunif(0,100)
+  tau_beta ~ dunif(0,100)
+  
+  mu0 ~ dnorm(50,pow(7.5,-2))
+  sigma2_0 = 1/sigma2_0_inv
+  sigma2_0_inv ~ dgamma(.5,.5)
+}
+```
+
+
+
+```{r}
+set.seed(1)
+jags_r <- jags(data = jags_data_republican,
+                  model.file = model,
+                  parameters.to.save = c("beta[1,1]", "beta[2,1]", "beta[3,1]", "beta[4,1]", "beta[5,1]", 
+                                         "beta[6,1]", "beta[7,1]", "beta[8,1]", "beta[9,1]", "beta[10,1]",
+                                         "beta[11,1]", "beta[12,1]", "beta[13,1]", "beta[14,1]", "beta[15,1]",
+                                         "beta[16,1]", "beta[17,1]", "beta[18,1]", "beta[19,1]", "beta[20,1]",
+                                         "beta[21,1]", "beta[22,1]", "beta[23,1]", "beta[24,1]", "beta[25,1]",
+                                         "beta[26,1]", "beta[27,1]", "beta[28,1]", "beta[29,1]", "beta[30,1]",
+                                         "beta[31,1]", "beta[32,1]"),
+                  n.iter = 1000)
+
+b1r <- jags_r$BUGSoutput$sims.array[1:1500]
+b10r <- jags_r$BUGSoutput$sims.array[1501:3000]
+b11r <- jags_r$BUGSoutput$sims.array[3001:4500]
+b12r <- jags_r$BUGSoutput$sims.array[4501:6000]
+b13r <- jags_r$BUGSoutput$sims.array[6001:7500]
+b14r <- jags_r$BUGSoutput$sims.array[7501:9000]
+b15r <- jags_r$BUGSoutput$sims.array[9001:10500]
+b16r <- jags_r$BUGSoutput$sims.array[10501:12000]
+b17r <- jags_r$BUGSoutput$sims.array[12001:13500]
+b18r <- jags_r$BUGSoutput$sims.array[13501:15000]
+b19r <- jags_r$BUGSoutput$sims.array[15001:16500]
+b2r <- jags_r$BUGSoutput$sims.array[16501:18000]
+b20r <- jags_r$BUGSoutput$sims.array[18001:19500]
+b21r <- jags_r$BUGSoutput$sims.array[19501:21000]
+b22r <- jags_r$BUGSoutput$sims.array[21001:22500]
+b23r <- jags_r$BUGSoutput$sims.array[22501:24000]
+b24r <- jags_r$BUGSoutput$sims.array[24001:25500]
+b25r <- jags_r$BUGSoutput$sims.array[25501:27000]
+b26r <- jags_r$BUGSoutput$sims.array[27001:28500]
+b27r <- jags_r$BUGSoutput$sims.array[28501:30000]
+b28r <- jags_r$BUGSoutput$sims.array[30001:31500]
+b29r <- jags_r$BUGSoutput$sims.array[31501:33000]
+b3r <- jags_r$BUGSoutput$sims.array[33001:34500]
+b30r <- jags_r$BUGSoutput$sims.array[34501:36000]
+b31r <- jags_r$BUGSoutput$sims.array[36001:37500]
+b32r <- jags_r$BUGSoutput$sims.array[37501:39000]
+b4r <- jags_r$BUGSoutput$sims.array[39001:40500]
+b5r <- jags_r$BUGSoutput$sims.array[40501:42000]
+b6r <- jags_r$BUGSoutput$sims.array[42001:43500]
+b7r <- jags_r$BUGSoutput$sims.array[43501:45000]
+b8r <- jags_r$BUGSoutput$sims.array[45001:46500]
+b9r <- jags_r$BUGSoutput$sims.array[46501:48000]
+
+# b33r <- jags_r$BUGSoutput$sims.array[39001:40500]
+# b34r <- jags_r$BUGSoutput$sims.array[40501:42000]
+# b4r <- jags_r$BUGSoutput$sims.array[42001:43500]
+# b5r <- jags_r$BUGSoutput$sims.array[43501:45000]
+# b6r <- jags_r$BUGSoutput$sims.array[45001:46500]
+# b7r <- jags_r$BUGSoutput$sims.array[46501:48000]
+# b8r <- jags_r$BUGSoutput$sims.array[48001:49500]
+# b9r <- jags_r$BUGSoutput$sims.array[49501:51000]
+
+```
+
+```{r}
+jags_r$BUGSoutput
+```
+
+
+```{r}
+w1 = ifelse(b1r > 50, 1, 0)
+w2 = ifelse(b2r > 50, 1, 0)
+w3 = ifelse(b3r > 50, 1, 0)
+w4 = ifelse(b4r > 50, 1, 0)
+w5 = ifelse(b5r > 50, 1, 0)
+w6 = ifelse(b6r > 50, 1, 0)
+w7 = ifelse(b7r > 50, 1, 0)
+w8 = ifelse(b8r > 50, 1, 0)
+w9 = ifelse(b9r > 50, 1, 0)
+w10 = ifelse(b10r > 50, 1, 0)
+w11 = ifelse(b11r > 50, 1, 0)
+w12 = ifelse(b12r > 50, 1, 0)
+w13 = ifelse(b13r > 50, 1, 0)
+w14 = ifelse(b14r > 50, 1, 0)
+w15 = ifelse(b15r > 50, 1, 0)
+w16 = ifelse(b16r > 50, 1, 0)
+w17 = ifelse(b17r > 50, 1, 0)
+w18 = ifelse(b18r > 50, 1, 0)
+w19 = ifelse(b19r > 50, 1, 0)
+w20 = ifelse(b20r > 50, 1, 0)
+w21 = ifelse(b21r > 50, 1, 0)
+w22 = ifelse(b22r > 50, 1, 0)
+w23 = ifelse(b23r > 50, 1, 0)
+w24 = ifelse(b24r > 50, 1, 0)
+w25 = ifelse(b25r > 50, 1, 0)
+w26 = ifelse(b26r > 50, 1, 0)
+w27 = ifelse(b27r > 50, 1, 0)
+w28 = ifelse(b28r > 50, 1, 0)
+w29 = ifelse(b29r > 50, 1, 0)
+w30 = ifelse(b30r > 50, 1, 0)
+w31 = ifelse(b31r > 50, 1, 0)
+w32 = ifelse(b32r > 50, 1, 0)
+#w33 = ifelse(b33r > b33d, 1, 0)
+#w34 = ifelse(b34r > b34d, 1, 0)
+
+
+r_wins <- data.frame(cbind(w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14, w15, w16, w17, w18, w19, w20, w21, w22, w23, w24, w25, w26, w27, w28, w29, w30, w31, w32))
+
+n = nrow(r_wins)
+
+#rowSums(r_wins)
+r_wins$total = rowSums(r_wins)
+
+#missing a few states, but these races aren't predicted to be close
+#CALIFORNIA (D) MISSISSIPI (R) MISSISSIPPI Special (R)
+# 51 R 49 D split before
+# 9 R up, 26 D up
+# R+6 needed more than 8 seats to keep majority
+
+repub_senate <- r_wins%>%
+  filter(total > 6) %>%
+  summarise(perc = n()/nrow(r_wins)) %>%
+  pull()
+
+repub_senate
+
+```
