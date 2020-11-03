@@ -97,7 +97,7 @@ model <- function(){
 
 ```{r run_model,eval=TRUE}
 #be sure to add your added parameters to parameters.to.save
-set.seed(2020)
+set.seed(13)
 jags_sims_trump <- jags(data = jags_data_trump,
                   model.file = model,
                   parameters.to.save = c("beta[1,1]",
@@ -194,31 +194,32 @@ b34r <- jags_r$BUGSoutput$sims.array[40501:42000]
 b35r <- jags_r$BUGSoutput$sims.array[42001:43500]
 b36r <- jags_r$BUGSoutput$sims.array[43501:45000]
 b37r <- jags_r$BUGSoutput$sims.array[45001:46500]
-b38r <- jags_r$BUGSoutput$sims.array[48001:49500]
-b39r <- jags_r$BUGSoutput$sims.array[49501:51000]
-b4r <- jags_r$BUGSoutput$sims.array[51001:52500]
-b40r <- jags_r$BUGSoutput$sims.array[52501:54000]
-b41r <- jags_r$BUGSoutput$sims.array[54001:55500]
-b42r <- jags_r$BUGSoutput$sims.array[55501:57000]
-b43r <- jags_r$BUGSoutput$sims.array[57001:58500]
-b44r <- jags_r$BUGSoutput$sims.array[58501:60000]
-b45r <- jags_r$BUGSoutput$sims.array[60001:61500]
-b46r <- jags_r$BUGSoutput$sims.array[61501:63000]
-b47r <- jags_r$BUGSoutput$sims.array[63001:64500]
-b48r <- jags_r$BUGSoutput$sims.array[64501:66000]
-b49r <- jags_r$BUGSoutput$sims.array[66001:67500]
-b5r <- jags_r$BUGSoutput$sims.array[69001:70500]
-b50r <- jags_r$BUGSoutput$sims.array[70501:72000]
-b51r <- jags_r$BUGSoutput$sims.array[72001:73500]
-b52r <- jags_r$BUGSoutput$sims.array[73501:75000]
-b53r <- jags_r$BUGSoutput$sims.array[75001:76500]
-b54r <- jags_r$BUGSoutput$sims.array[76501:78000]
-b55r <- jags_r$BUGSoutput$sims.array[78001:79500]
-b56r <- jags_r$BUGSoutput$sims.array[79501:81000]
-b6r <- jags_r$BUGSoutput$sims.array[81001:82500]
-b7r <- jags_r$BUGSoutput$sims.array[82501:84000]
-b8r <- jags_r$BUGSoutput$sims.array[84001:85500]
-b9r <- jags_r$BUGSoutput$sims.array[85501:87000]
+b38r <- jags_r$BUGSoutput$sims.array[46501:48000]
+b39r <- jags_r$BUGSoutput$sims.array[48001:49500]
+b4r <- jags_r$BUGSoutput$sims.array[49501:51000]
+b40r <- jags_r$BUGSoutput$sims.array[51001:52500]
+b41r <- jags_r$BUGSoutput$sims.array[52501:54000]
+b42r <- jags_r$BUGSoutput$sims.array[54001:55500]
+b43r <- jags_r$BUGSoutput$sims.array[55501:57000]
+b44r <- jags_r$BUGSoutput$sims.array[57001:58500]
+b45r <- jags_r$BUGSoutput$sims.array[58501:60000]
+b46r <- jags_r$BUGSoutput$sims.array[60001:61500]
+b47r <- jags_r$BUGSoutput$sims.array[61501:63000]
+b48r <- jags_r$BUGSoutput$sims.array[63001:64500]
+b49r <- jags_r$BUGSoutput$sims.array[64501:66000]
+b5r <- jags_r$BUGSoutput$sims.array[66001:67500]
+b50r <- jags_r$BUGSoutput$sims.array[67501:69000]
+b51r <- jags_r$BUGSoutput$sims.array[69001:70500]
+b52r <- jags_r$BUGSoutput$sims.array[70501:72000]
+b53r <- jags_r$BUGSoutput$sims.array[72001:73500]
+b54r <- jags_r$BUGSoutput$sims.array[73501:75000]
+b55r <- jags_r$BUGSoutput$sims.array[75001:76500]
+b56r <- jags_r$BUGSoutput$sims.array[76501:78000]
+b6r <- jags_r$BUGSoutput$sims.array[78001:79500]
+b7r <- jags_r$BUGSoutput$sims.array[79501:81000]
+b8r <- jags_r$BUGSoutput$sims.array[81001:82500]
+b9r <- jags_r$BUGSoutput$sims.array[82501:84000]
+
 
 w1 = ifelse(b1r > 50, 6, 0) #IA
 w2 = ifelse(b2r > 50, 20, 0) #PA
@@ -396,9 +397,7 @@ jags_r <- jags(data = jags_data,model.file = model,parameters.to.save = c("beta[
                                                                           "beta[48,1]",
                                                                           "beta[49,1]",
                                                                           "beta[50,1]",
-                                                                          "beta[51,1]",
-                                                                          "sigma2_beta",
-                                                                             "p","sigma2_y"),
+                                                                          "beta[51,1]"),
                   n.iter = 1000)
 ```
 
@@ -443,22 +442,27 @@ b34r <- jags_r$BUGSoutput$sims.array[40501:42000]
 b35r <- jags_r$BUGSoutput$sims.array[42001:43500]
 b36r <- jags_r$BUGSoutput$sims.array[43501:45000]
 b37r <- jags_r$BUGSoutput$sims.array[45001:46500]
-b38r <- jags_r$BUGSoutput$sims.array[48001:49500]
-b39r <- jags_r$BUGSoutput$sims.array[49501:51000]
-b4r <- jags_r$BUGSoutput$sims.array[51001:52500]
-b40r <- jags_r$BUGSoutput$sims.array[52501:54000]
-b41r <- jags_r$BUGSoutput$sims.array[54001:55500]
-b42r <- jags_r$BUGSoutput$sims.array[55501:57000]
-b43r <- jags_r$BUGSoutput$sims.array[57001:58500]
-b44r <- jags_r$BUGSoutput$sims.array[58501:60000]
-b45r <- jags_r$BUGSoutput$sims.array[60001:61500]
-b46r <- jags_r$BUGSoutput$sims.array[61501:63000]
-b47r <- jags_r$BUGSoutput$sims.array[63001:64500]
-b48r <- jags_r$BUGSoutput$sims.array[64501:66000]
-b49r <- jags_r$BUGSoutput$sims.array[66001:67500]
-b5r <- jags_r$BUGSoutput$sims.array[69001:70500]
-b50r <- jags_r$BUGSoutput$sims.array[70501:72000]
-b51r <- jags_r$BUGSoutput$sims.array[72001:73500]
+b38r <- jags_r$BUGSoutput$sims.array[46501:48000]
+b39r <- jags_r$BUGSoutput$sims.array[48001:49500]
+b4r <- jags_r$BUGSoutput$sims.array[49501:51000]
+b40r <- jags_r$BUGSoutput$sims.array[51001:52500]
+b41r <- jags_r$BUGSoutput$sims.array[52501:54000]
+b42r <- jags_r$BUGSoutput$sims.array[54001:55500]
+b43r <- jags_r$BUGSoutput$sims.array[55501:57000]
+b44r <- jags_r$BUGSoutput$sims.array[57001:58500]
+b45r <- jags_r$BUGSoutput$sims.array[58501:60000]
+b46r <- jags_r$BUGSoutput$sims.array[60001:61500]
+b47r <- jags_r$BUGSoutput$sims.array[61501:63000]
+b48r <- jags_r$BUGSoutput$sims.array[63001:64500]
+b49r <- jags_r$BUGSoutput$sims.array[64501:66000]
+b5r <- jags_r$BUGSoutput$sims.array[66001:67500]
+b50r <- jags_r$BUGSoutput$sims.array[67501:69000]
+b51r <- jags_r$BUGSoutput$sims.array[69001:70500]
+b6r <- jags_r$BUGSoutput$sims.array[70501:72000]
+b7r <- jags_r$BUGSoutput$sims.array[72001:73500]
+b8r <- jags_r$BUGSoutput$sims.array[73501:75000]
+b9r <- jags_r$BUGSoutput$sims.array[75001:76500]
+
 
 w1 = ifelse(b1r > 50, 0, 0) # US
 w2 = ifelse(b2r > 50, 3, 0) # AK
