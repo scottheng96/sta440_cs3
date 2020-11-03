@@ -24,11 +24,8 @@ full_counties <- full_join(full_counties, nc_2016_data, by = "county")
 ```
 
 ```{r}
-dem2016 <- read.csv(file='data/NC-counties-percent-democrat-2016.csv')
-dem2018 <- read.csv(file='data/NC-counties-percent-democrat-2018.csv')
 rep2016 <- read.csv(file='data/NC-counties-percent-republican-2016.csv')
 rep2018 <- read.csv(file='data/NC-counties-percent-republican-2018.csv')
-  
 ```
 
 
@@ -77,6 +74,21 @@ rep2018 <- rep2018 %>%
                                      district == 11 ~ "NONE",
                                      district == 12 ~ "DEM",
                                      district == 13 ~ "REP"))
+
+rep2016 <- rep2016 %>%
+  mutate(incumbent_party = case_when(district == 1 ~ "DEM",
+                                     district == 2 ~ "DEM",
+                                     district == 3 ~ "REP",
+                                     district == 4 ~ "DEM",
+                                     district == 5 ~ "REP",
+                                     district == 6 ~ "REP",
+                                     district == 7 ~ "REP",
+                                     district == 8 ~ "REP",
+                                     district == 9 ~ "REP",
+                                     district == 10 ~ "REP",
+                                     district == 11 ~ "NONE",
+                                     district == 12 ~ "DEM",
+                                     district == 13 ~ "REP"))
 ```
 
 
@@ -85,7 +97,7 @@ library(lme4)
 library(merTools)
 
 # linear mixed model with random effect for county
-M2 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 +  incumbent_party + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2018, control = lmerControl(optimizer ="Nelder_Mead"))
+M2 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 +  incumbent_party + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2016, control = lmerControl(optimizer ="Nelder_Mead"))
 summary(M2)
 coef(M2)
 
@@ -115,14 +127,92 @@ modified_counties %>%
             dist_lwr_rep = sum(lower*voters)/sum(voters),
             dist_upr_rep = sum(upper*voters)/sum(voters))
 
-
 ```
+
+```{r}
+plot(M2)
+qqnorm(residuals(M2))
+```
+
+```{r}
+# linear mixed model with random effect for county
+M2 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 +  incumbent_party + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2018, control = lmerControl(optimizer ="Nelder_Mead"))
+summary(M2)
+coef(M2)
+
+PI <- predictInterval(merMod = M2, newdata = full_counties,
+                        level = 0.95, n.sims = 1000,
+                        stat = "median", type="linear.prediction",
+                        include.resid.var = TRUE)
+
+# account for counties split into 2 districts
+modified_counties <- full_counties %>%
+  mutate(Totals = as.numeric(gsub(",","",Totals))) %>%
+  mutate(voters = case_when(split == "y" ~ Totals/2,
+                            TRUE ~ Totals))
+
+modified_counties$fit = PI$fit
+modified_counties$lower = PI$lwr
+modified_counties$upper = PI$upr
+
+# weight county vote share by number of people who voted in 2016 election
+modified_counties %>%
+  group_by(district) %>%
+  summarise(dist_share_rep = sum(fit*voters)/sum(voters),
+            dist_lwr_rep = sum(lower*voters)/sum(voters),
+            dist_upr_rep = sum(upper*voters)/sum(voters))
+```
+
+```{r}
+plot(M2)
+qqnorm(residuals(M2))
+```
+
 
 # Senate Predictions
 ```{r}
 # estimate percentages across whole state
 
+M2 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2016, control = lmerControl(optimizer ="Nelder_Mead"))
+summary(M2)
+coef(M2)
 
+PI <- predictInterval(merMod = M2, newdata = full_counties,
+                        level = 0.95, n.sims = 1000,
+                        stat = "median", type="linear.prediction",
+                        include.resid.var = TRUE)
+
+# account for counties split into 2 districts
+modified_counties <- full_counties %>%
+  mutate(Totals = as.numeric(gsub(",","",Totals))) %>%
+  mutate(voters = case_when(split == "y" ~ Totals/2,
+                            TRUE ~ Totals))
+
+modified_counties$fit = PI$fit
+modified_counties$lower = PI$lwr
+modified_counties$upper = PI$upr
+
+# weight county vote share by number of people who voted in 2016 election
+modified_counties %>%
+  group_by(district) %>%
+  summarise(dist_share_rep = sum(fit*voters)/sum(voters),
+            dist_lwr_rep = sum(lower*voters)/sum(voters),
+            dist_upr_rep = sum(upper*voters)/sum(voters))
+
+modified_counties %>%
+  summarise(dist_share_rep = sum(fit*voters)/sum(voters),
+            dist_lwr_rep = sum(lower*voters)/sum(voters),
+            dist_upr_rep = sum(upper*voters)/sum(voters))
+
+```
+
+```{r}
+plot(M2)
+qqnorm(residuals(M2))
+```
+
+```{r}
+# estimate percentages across whole state
 
 M2 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2018, control = lmerControl(optimizer ="Nelder_Mead"))
 summary(M2)
@@ -156,42 +246,8 @@ modified_counties %>%
             dist_upr_rep = sum(upper*voters)/sum(voters))
 
 ```
-
 ```{r}
-# estimate percentages across whole state
-
-
-
-M2 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2016, control = lmerControl(optimizer ="Nelder_Mead"))
-summary(M2)
-coef(M2)
-
-PI <- predictInterval(merMod = M2, newdata = full_counties,
-                        level = 0.95, n.sims = 1000,
-                        stat = "median", type="linear.prediction",
-                        include.resid.var = TRUE)
-
-# account for counties split into 2 districts
-modified_counties <- full_counties %>%
-  mutate(Totals = as.numeric(gsub(",","",Totals))) %>%
-  mutate(voters = case_when(split == "y" ~ Totals/2,
-                            TRUE ~ Totals))
-
-modified_counties$fit = PI$fit
-modified_counties$lower = PI$lwr
-modified_counties$upper = PI$upr
-
-# weight county vote share by number of people who voted in 2016 election
-modified_counties %>%
-  group_by(district) %>%
-  summarise(dist_share_rep = sum(fit*voters)/sum(voters),
-            dist_lwr_rep = sum(lower*voters)/sum(voters),
-            dist_upr_rep = sum(upper*voters)/sum(voters))
-
-modified_counties %>%
-  summarise(dist_share_rep = sum(fit*voters)/sum(voters),
-            dist_lwr_rep = sum(lower*voters)/sum(voters),
-            dist_upr_rep = sum(upper*voters)/sum(voters))
-
+plot(M2)
+qqnorm(residuals(M2))
 ```
 
