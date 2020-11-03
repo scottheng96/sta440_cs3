@@ -194,6 +194,8 @@ For model validation, we plot traceplots for all the beta coefficients. From the
 
 On top of standard model validation tools, we also performed out-of sample validation by implementing the same model on 2016 data to predict the results of the Clinton-Trump When validating on 2016 election data, we predicted that Clinton had a 87.1% chance of winning. Clinton didn't end up winning the election, however many election prediction models forecasted that she would have a landslide victory. Thus, our model is seemingly consistent with what experts were predicting, which is another aspect of good model fit for the study. 
 
+Sensitivity analysis was again conducted by changing the prior for $\mu_0$ in the model. We tried increasing and decreasing the variance of $\mu_0$, but had no impact on our prediction. We still got estimated probabilities of 0%. 
+
 ## US Senate Model Results
 
 We predict that the Republicans have a 0.2% chance of keeping control of the senate. The Republican party wins between 10 and 18 seats most of the time in our simulations, which is shy of the 22 seats needed to win a majority. 
@@ -202,7 +204,9 @@ We predict that the Republicans have a 0.2% chance of keeping control of the sen
 
 Traceplots for this model indicate that convergence was also reached for this model. Additionally, lag-1 scatterplots and autocorrelation plots show that there is no need to be concerned about non-random data or correlations. All of our Rhat values are close to 1, again indicating that the chains have mixed well. 
 
-When using our model to predict the chance of Republicans controlling the senate after the 2018 midterm elections, we get a probability of 71.4%. This estimate seems to be close to what many other well-known political models forecasted, and the Republicans did indeed keep control of the senate after this election. 
+When using our model to predict the chance of Republicans controlling the senate after the 2018 midterm elections, we get a probability of 71.4%. This estimate seems to be close to what many other well-known political models forecasted, and the Republicans did indeed keep control of the senate after this election.
+
+Sensitivity analysis was again conducted by changing the prior for $\mu_0$ in the model. We tried increasing and decreasing the variance of $\mu_0$, but had almost no impact on our prediction. We still got estimated probabilities of less than 1%. 
 
 ## North Carolina Senate Model Results
 
