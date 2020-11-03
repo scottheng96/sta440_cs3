@@ -154,7 +154,28 @@ Similar to our electoral college model, this model looks at senate race polling 
 
 ## North Carolina Senate Model
 
+
+$$\begin{aligned}
+Republican \ Share_{i} = \alpha_{i} + \beta_{travel\ time_i} + \beta_{foreign \ share_i} + \beta_{single \ parent \
+ share_i} + \\
+ \beta_{fraction \ college_i} + \beta_{poor \ share_i} + \beta_{two \ bed \ rent_i} + \beta_{job \ growth_i} + \\ 
+ \beta_{share \ white_i} + \beta_{share \ black_i} + \beta_{share \ hispanic_i} + \beta_{share \ asian_i} + \\ \beta_{incumbent \ party \ Republican_i} + \beta_{incumbent \ party \ None_i} +\epsilon_{i} \\ 
+where \ \alpha_{i} \sim N(\gamma_0, \tau^2)  \\ 
+and \ \epsilon_{i} \sim N(0, \sigma^2)
+\end{aligned}$$
+
+i represents a given county.
+
 ## North Carolina House Model
+
+$$\begin{aligned}
+Republican \ Share_{i} = \alpha_{i} + \beta_{travel\ time_i} + \beta_{foreign \ share_i} + \beta_{single \ parent \
+ share_i} + \\
+ \beta_{fraction \ college_i} + \beta_{poor \ share_i} + \beta_{two \ bed \ rent_i} + \beta_{job \ growth_i} + \\ 
+ \beta_{share \ white_i} + \beta_{share \ black_i} + \beta_{share \ hispanic_i} + \beta_{share \ asian_i} +  \epsilon_{i} \\ 
+where \ \alpha_{i} \sim N(\gamma_0, \tau^2)  \\ 
+and \ \epsilon_{i} \sim N(0, \sigma^2)
+\end{aligned}$$
 
 
 # Appendix B: Data Sources 
