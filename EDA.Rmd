@@ -131,3 +131,38 @@ filtered_NC_senate %>%
     geom_vline(xintercept=as.Date('2020-10-06')) + 
     geom_hline(yintercept=50)
 ```
+
+
+```{r}
+voters <- readRDS("./data/ncvoter_Statewide_small.rds")
+voters <- voters %>%
+  mutate(race_code = as.character(race_code)) %>%
+  mutate(gender_code = as.character(gender_code)) %>%
+  mutate(race_code = case_when(race_code == ' ' ~ 'U', race_code != ' ' ~ race_code)) %>%
+  mutate(gender_code = case_when(gender_code == ' ' ~ 'U', gender_code != ' ' ~ gender_code)) %>%
+  mutate(race_code = as.factor(race_code)) %>%
+  mutate(gender_code = as.factor(gender_code))
+```
+
+```{r}
+captions <- c("Figure 1: The distribution of registered voters in North Carolina by race.", 
+              "Figure 2: The distribution of registered voters in North Carolina by ethnicity.",
+              "Figure 3: The distribution of registered voters in North Carolina by gender.",
+              "Figure 4: The distribution of registered voters in North Carolina by party affiliation.")
+big_caption <- "Exploratory data analysis for all of the registered voters in North Carolina. "
+```
+
+```{r fig.align="center", echo=FALSE, results=FALSE, warning=FALSE,fig.cap = big_caption, fig.subcap=captions, fig.ncol=2, fig.asp=1, out.width='.49\\linewidth'}
+p1 <- ggplot(data = voters, aes(x = race_code)) + geom_bar(stat='count') + ggtitle("Distribution by Race within Registered Voters of North Carolina") + xlab("Race Encoding") + theme(plot.caption = element_text(hjust = 0.5))
+p2 <- ggplot(data = voters, aes(x = ethnic_code)) + geom_bar(stat='count') + ggtitle("Distribution by Ethnicity within Registered Voters of North Carolina") + xlab("Ethnicity Encoding") + theme(plot.caption = element_text(hjust = 0.5))
+p3 <- ggplot(data = voters, aes(x = gender_code)) + geom_bar(stat = 'count') + ggtitle("Distribution by Gender within Registered Voters of North Carolina") + xlab("Gender Encoding") + theme(plot.caption = element_text(hjust = 0.5))
+p4 <- ggplot(data = voters, aes(x = party_cd)) + geom_bar(stat='count') + ggtitle("Distribution by Party Affiliation within Registered Voters of North Carolina") + xlab("Party Affiliation") + theme(plot.caption = element_text(hjust = 0.5))
+p1
+p2
+p3
+p4
+```
+
+
+
+
