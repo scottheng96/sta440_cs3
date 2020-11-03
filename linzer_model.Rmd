@@ -207,14 +207,120 @@ model <- function(){
   sigma2_0_inv ~ dgamma(.5,.5)
 }
 
-jags_sims <- jags(data = jags_data,model.file = model,parameters.to.save = c("beta","sigma2_beta",
+jags_r <- jags(data = jags_data,model.file = model,parameters.to.save = c("beta","sigma2_beta",
                                                                              "p","sigma2_y"),
                   n.iter = 1500)
 ```
 
-```{r}
-clinton_df <- data.frame(jags_sims$BUGSoutput$summary)[1:56,] %>% select(n.eff,mean,sd)
 
-binary_pref_clinton <- ifelse(clinton_df$mean >50, 1,0)
-jags_sims$BUGSoutput$sims.array[1:1500]
+
+```{r}
+elec_votes_r <- c(9,9,3,6,11,55,9,7,3,29,16,4,4,20,11,6,8,8,4,10,11,16,10,6,10,3,15,3,4,14,5,6,6,29,3,18,7,7,20,4,9,3,11,38,6,13,3,12,10,5,3)
+
+b1r <- jags_r$BUGSoutput$sims.array[1:1500]
+b10r <- jags_r$BUGSoutput$sims.array[1501:3000]
+b11r <- jags_r$BUGSoutput$sims.array[3001:4500]
+b12r <- jags_r$BUGSoutput$sims.array[4501:6000]
+b13r <- jags_r$BUGSoutput$sims.array[6001:7500]
+b14r <- jags_r$BUGSoutput$sims.array[7501:9000]
+b15r <- jags_r$BUGSoutput$sims.array[9001:10500]
+b16r <- jags_r$BUGSoutput$sims.array[10501:12000]
+b17r <- jags_r$BUGSoutput$sims.array[12001:13500]
+b18r <- jags_r$BUGSoutput$sims.array[13501:15000]
+b19r <- jags_r$BUGSoutput$sims.array[15001:16500]
+b2r <- jags_r$BUGSoutput$sims.array[16501:18000]
+b20r <- jags_r$BUGSoutput$sims.array[18001:19500]
+b21r <- jags_r$BUGSoutput$sims.array[19501:21000]
+b22r <- jags_r$BUGSoutput$sims.array[21001:22500]
+b23r <- jags_r$BUGSoutput$sims.array[22501:24000]
+b24r <- jags_r$BUGSoutput$sims.array[24001:25500]
+b25r <- jags_r$BUGSoutput$sims.array[25501:27000]
+b26r <- jags_r$BUGSoutput$sims.array[27001:28500]
+b27r <- jags_r$BUGSoutput$sims.array[28501:30000]
+b28r <- jags_r$BUGSoutput$sims.array[30001:31500]
+b29r <- jags_r$BUGSoutput$sims.array[31501:33000]
+b3r <- jags_r$BUGSoutput$sims.array[33001:34500]
+b30r <- jags_r$BUGSoutput$sims.array[34501:36000]
+b31r <- jags_r$BUGSoutput$sims.array[36001:37500]
+b32r <- jags_r$BUGSoutput$sims.array[37501:39000]
+b33r <- jags_r$BUGSoutput$sims.array[39001:40500]
+b34r <- jags_r$BUGSoutput$sims.array[40501:42000]
+b35r <- jags_r$BUGSoutput$sims.array[42001:43500]
+b36r <- jags_r$BUGSoutput$sims.array[43501:45000]
+b37r <- jags_r$BUGSoutput$sims.array[45001:46500]
+b38r <- jags_r$BUGSoutput$sims.array[48001:49500]
+b39r <- jags_r$BUGSoutput$sims.array[49501:51000]
+b4r <- jags_r$BUGSoutput$sims.array[51001:52500]
+b40r <- jags_r$BUGSoutput$sims.array[52501:54000]
+b41r <- jags_r$BUGSoutput$sims.array[54001:55500]
+b42r <- jags_r$BUGSoutput$sims.array[55501:57000]
+b43r <- jags_r$BUGSoutput$sims.array[57001:58500]
+b44r <- jags_r$BUGSoutput$sims.array[58501:60000]
+b45r <- jags_r$BUGSoutput$sims.array[60001:61500]
+b46r <- jags_r$BUGSoutput$sims.array[61501:63000]
+b47r <- jags_r$BUGSoutput$sims.array[63001:64500]
+b48r <- jags_r$BUGSoutput$sims.array[64501:66000]
+b49r <- jags_r$BUGSoutput$sims.array[66001:67500]
+b5r <- jags_r$BUGSoutput$sims.array[69001:70500]
+b50r <- jags_r$BUGSoutput$sims.array[70501:72000]
+b51r <- jags_r$BUGSoutput$sims.array[72001:73500]
+
+w1 = ifelse(b1r > 50, 1, 0)
+w2 = ifelse(b2r > 50, 1, 0)
+w3 = ifelse(b3r > 50, 1, 0)
+w4 = ifelse(b4r > 50, 1, 0)
+w5 = ifelse(b5r > 50, 1, 0)
+w6 = ifelse(b6r > 50, 1, 0)
+w7 = ifelse(b7r > 50, 1, 0)
+w8 = ifelse(b8r > 50, 1, 0)
+w9 = ifelse(b9r > 50, 1, 0)
+w10 = ifelse(b10r > 50, 1, 0)
+w11 = ifelse(b11r > 50, 1, 0)
+w12 = ifelse(b12r > 50, 1, 0)
+w13 = ifelse(b13r > 50, 1, 0)
+w14 = ifelse(b14r > 50, 1, 0)
+w15 = ifelse(b15r > 50, 1, 0)
+w16 = ifelse(b16r > 50, 1, 0)
+w17 = ifelse(b17r > 50, 1, 0)
+w18 = ifelse(b18r > 50, 1, 0)
+w19 = ifelse(b19r > 50, 1, 0)
+w20 = ifelse(b20r > 50, 1, 0)
+w21 = ifelse(b21r > 50, 1, 0)
+w22 = ifelse(b22r > 50, 1, 0)
+w23 = ifelse(b23r > 50, 1, 0)
+w24 = ifelse(b24r > 50, 1, 0)
+w25 = ifelse(b25r > 50, 1, 0)
+w26 = ifelse(b26r > 50, 1, 0)
+w27 = ifelse(b27r > 50, 1, 0)
+w28 = ifelse(b28r > 50, 1, 0)
+w29 = ifelse(b29r > 50, 1, 0)
+w30 = ifelse(b30r > 50, 1, 0)
+w31 = ifelse(b31r > 50, 1, 0)
+w32 = ifelse(b32r > 50, 1, 0)
+w33 = ifelse(b33r > 50, 1, 0)
+w34 = ifelse(b34r > 50, 1, 0)
+w35 = ifelse(b35r > 50, 1, 0)
+w36 = ifelse(b36r > 50, 1, 0)
+w37 = ifelse(b37r > 50, 1, 0)
+w38 = ifelse(b38r > 50, 1, 0)
+w39 = ifelse(b39r > 50, 1, 0)
+w40 = ifelse(b40r > 50, 1, 0)
+w41 = ifelse(b41r > 50, 1, 0)
+w42 = ifelse(b42r > 50, 1, 0)
+w43 = ifelse(b43r > 50, 1, 0)
+w44 = ifelse(b44r > 50, 1, 0)
+w45 = ifelse(b45r > 50, 1, 0)
+w46 = ifelse(b46r > 50, 1, 0)
+w47 = ifelse(b47r > 50, 1, 0)
+w48 = ifelse(b48r > 50, 1, 0)
+w49 = ifelse(b49r > 50, 1, 0)
+w50 = ifelse(b50r > 50, 1, 0)
+w51 = ifelse(b51r > 50, 1, 0)
+
+r_wins <- data.frame(cbind(w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14, w15, w16, w17, w18, w19, w20, w21, w22, w23, w24, w25, w26, w27, w28, w29, w30, w31,w32,w33,w34,w35,w36,w37,w38,w39,w40,w41,w42,w43,w44,w45,w46,w47,w48,w49,w50,w51))
+```
+
+```{r}
+r_matrix <- as.matrix(r_wins)
+r_matrix %*% elec_votes_r
 ```
