@@ -278,6 +278,9 @@ $$\begin{aligned}
 \end{aligned}$$.
 We only consider polls ending 200 days or less before the election. We include polls from all 50 states.
 
+The Republican presidential candidate wins the electoral college for state $j$ if $w_j := \beta_{j,1} > 0.5$. The same candidate wins the election if 
+$$\sum_{j=1}^{50} w_j ec_j \geq 270$$, where $ec_j$ is the number of electoral votes for state $j$.
+
 ### Estimates From Model
 
 ```{r, echo = FALSE, warning = F, messge = F}
@@ -566,7 +569,7 @@ This model predicts the probability that the senate will remain in Republican co
 
 ### Model Structure
 
-This model is identical to that for the electoral college, except only a subset of the states and we consider polls ending 364 days or less before the election.
+This model is identical to that for the electoral college, except only a subset of the states and we consider polls ending 364 days or less before the election. A Republican senator wins their respective election in state $j$ if $\beta_{j,1} > 0.5$. 
 
 ### Estimates From Model
 ```{r, echo = FALSE, warning = F, message = F}
