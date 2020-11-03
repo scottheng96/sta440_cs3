@@ -566,6 +566,38 @@ trump_electoral
 jags_r$BUGSoutput
 ```
 
+```{r}
+max_day = 120 # TODO modify (max for plotting/saving parameters)
+beta_j_strings = paste0('beta[', seq(1, length(states)), ',')
+all_beta_strings = c()
+for (beta_j_string in beta_j_strings) {
+  all_beta_strings = c(all_beta_strings, paste0(beta_j_string, seq(1, max_day), ']'))
+}
+jags_r_all <- jags(data = jags_data_trump,
+                  model.file = model,
+                  parameters.to.save = all_beta_strings,
+                  n.iter = 1000)
+
+poll_plot_data <- tibble(y=jags_data_trump$y,t=jags_data_trump$t %>% as.integer(), state = states[jags_data_trump$r])
+
+beta_plot_data <- lapply(1:N_states,function(st){
+  sims <- jags_r_all$BUGSoutput$sims.list$beta[,st,1:max_day]
+  data.frame(state = states[st],t=1:max_day,mean=colMeans(sims),lb=apply(sims,2,quantile,probs=.025),ub=apply(sims,2,quantile,probs=.975))
+}) %>% 
+  bind_rows()
+
+good_states = states[1:length*states] # TODO modify to plot less things
+
+left_join(beta_plot_data,poll_plot_data) %>% 
+  filter(state %in% good_states) %>%
+  ggplot(aes(x=t)) + 
+  geom_line(aes(y=mean)) + 
+  geom_ribbon(aes(ymin = lb,ymax = ub),alpha = .2) + 
+  geom_point(aes(y=y)) + 
+  scale_x_reverse() + 
+  ylim(10, 90) + # TODO remove to show large uncertainty before first poll
+  facet_wrap(~ state)
+```
 ## 3. US Senate Model
 
 ### Model Purpose
