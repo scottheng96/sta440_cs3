@@ -148,7 +148,7 @@ model <- function(){
 
 
 ```{r}
-set.seed(1)
+set.seed(3)
 jags_r <- jags(data = jags_data_republican,
                   model.file = model,
                   parameters.to.save = c("beta[1,1]", "beta[2,1]", "beta[3,1]", "beta[4,1]", "beta[5,1]", 
@@ -156,7 +156,8 @@ jags_r <- jags(data = jags_data_republican,
                                          "beta[11,1]", "beta[12,1]", "beta[13,1]", "beta[14,1]", "beta[15,1]",
                                          "beta[16,1]", "beta[17,1]", "beta[18,1]", "beta[19,1]", "beta[20,1]",
                                          "beta[21,1]", "beta[22,1]", "beta[23,1]", "beta[24,1]", "beta[25,1]",
-                                         "beta[26,1]", "beta[27,1]", "beta[28,1]", "beta[29,1]"),
+                                         "beta[26,1]", "beta[27,1]", "beta[28,1]", "beta[29,1]", "beta[30,1]",
+                                         "beta[31,1]"),
                   n.iter = 1000)
 
 b1r <- jags_r$BUGSoutput$sims.array[1:1500]
@@ -182,12 +183,14 @@ b27r <- jags_r$BUGSoutput$sims.array[28501:30000]
 b28r <- jags_r$BUGSoutput$sims.array[30001:31500]
 b29r <- jags_r$BUGSoutput$sims.array[31501:33000]
 b3r <- jags_r$BUGSoutput$sims.array[33001:34500]
-b4r <- jags_r$BUGSoutput$sims.array[34501:36000]
-b5r <- jags_r$BUGSoutput$sims.array[36001:37500]
-b6r <- jags_r$BUGSoutput$sims.array[37501:39000]
-b7r <- jags_r$BUGSoutput$sims.array[39001:40500]
-b8r <- jags_r$BUGSoutput$sims.array[40501:42000]
-b9r <- jags_r$BUGSoutput$sims.array[42001:43500]
+b30r <- jags_r$BUGSoutput$sims.array[34501:36000]
+b31r <- jags_r$BUGSoutput$sims.array[36001:37500]
+b4r <- jags_r$BUGSoutput$sims.array[37501:39000]
+b5r <- jags_r$BUGSoutput$sims.array[39001:40500]
+b6r <- jags_r$BUGSoutput$sims.array[40501:42000]
+b7r <- jags_r$BUGSoutput$sims.array[42001:43500]
+b8r <- jags_r$BUGSoutput$sims.array[43501:45000]
+b9r <- jags_r$BUGSoutput$sims.array[45001:46500]
 
 
 jags_d <- jags(data = jags_data_not_republican,
@@ -197,7 +200,8 @@ jags_d <- jags(data = jags_data_not_republican,
                                          "beta[11,1]", "beta[12,1]", "beta[13,1]", "beta[14,1]", "beta[15,1]",
                                          "beta[16,1]", "beta[17,1]", "beta[18,1]", "beta[19,1]", "beta[20,1]",
                                          "beta[21,1]", "beta[22,1]", "beta[23,1]", "beta[24,1]", "beta[25,1]",
-                                         "beta[26,1]", "beta[27,1]", "beta[28,1]", "beta[29,1]"),
+                                         "beta[26,1]", "beta[27,1]", "beta[28,1]", "beta[29,1]", "beta[30,1]",
+                                         "beta[31,1]"),
                   n.iter = 1000)
 
 b1d <- jags_d$BUGSoutput$sims.array[1:1500]
@@ -222,13 +226,15 @@ b26d <- jags_d$BUGSoutput$sims.array[27001:28500]
 b27d <- jags_d$BUGSoutput$sims.array[28501:30000]
 b28d <- jags_d$BUGSoutput$sims.array[30001:31500]
 b29d <- jags_d$BUGSoutput$sims.array[31501:33000]
-b3d <- jags_d$BUGSoutput$sims.array[33001:34500]
-b4d <- jags_d$BUGSoutput$sims.array[34501:36000]
-b5d <- jags_d$BUGSoutput$sims.array[36001:37500]
-b6d <- jags_d$BUGSoutput$sims.array[37501:39000]
-b7d <- jags_d$BUGSoutput$sims.array[39001:40500]
-b8d <- jags_d$BUGSoutput$sims.array[40501:42000]
-b9d <- jags_d$BUGSoutput$sims.array[42001:43500]
+b3d <- jags_d  $BUGSoutput$sims.array[33001:34500]
+b30d <- jags_d  $BUGSoutput$sims.array[34501:36000]
+b31d <- jags_d  $BUGSoutput$sims.array[36001:37500]
+b4d <- jags_d  $BUGSoutput$sims.array[37501:39000]
+b5d <- jags_d  $BUGSoutput$sims.array[39001:40500]
+b6d <- jags_d  $BUGSoutput$sims.array[40501:42000]
+b7d <- jags_d  $BUGSoutput$sims.array[42001:43500]
+b8d <- jags_d  $BUGSoutput$sims.array[43501:45000]
+b9d <- jags_d  $BUGSoutput$sims.array[45001:46500]
 
 ```
 
@@ -262,9 +268,11 @@ w26 = ifelse(b26r > b26d, 1, 0)
 w27 = ifelse(b27r > b27d, 1, 0)
 w28 = ifelse(b28r > b28d, 1, 0)
 w29 = ifelse(b29r > b29d, 1, 0)
-w30 = ifelse(b2r > b2d, 1, 0)
+w30 = ifelse(b30r > b30d, 1, 0)
+w31 = ifelse(b31r > b31d, 1, 0)
+w32 = ifelse(b3r > b3d, 1, 0)
 
-r_wins <- data.frame(cbind(w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14, w15, w16, w17, w18, w19, w20, w21, w22, w23, w24, w25, w26, w27, w28, w29, w30))
+r_wins <- data.frame(cbind(w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14, w15, w16, w17, w18, w19, w20, w21, w22, w23, w24, w25, w26, w27, w28, w29, w30, w31, w32))
 
 n = nrow(r_wins)
 
@@ -272,13 +280,12 @@ n = nrow(r_wins)
 r_wins$total = rowSums(r_wins)
 
 #missing a few states, but these races aren't predicted to be close
-#ARKANSAS(R) #RHODE ISLAND(D) #SOUTH DAKOTA(R) #WEST VIRGINIA(R) #WYOMING(R) #LOUISIANA(R)
-# double Georgia
-# R + 5, need 21 total for split
-#16
+#RHODE ISLAND(D) #SOUTH DAKOTA(R) #LOUISIANA(R) #double Georgia
+# R + 2, need 21 total for split
+#19
 
 repub_senate <- r_wins%>%
-  filter(total > 16) %>%
+  filter(total > 19) %>%
   summarise(perc = n()/nrow(r_wins)) %>%
   pull()
 
