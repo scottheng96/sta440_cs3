@@ -12,6 +12,8 @@ library(gridExtra)
 library(R2jags)
 library(lme4)
 library(merTools)
+library(kableExtra)
+library(brms)
 ```
 
 # Introduction
