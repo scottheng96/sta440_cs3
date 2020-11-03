@@ -159,6 +159,11 @@ jags_sims_trump <- jags(data = jags_data_trump,
                   n.iter = 1000)
 ```
 
+```{r}
+jags_r$BUGSoutput
+```
+
+
 <!-- 2020 sims -->
 ```{r}
 #trump
