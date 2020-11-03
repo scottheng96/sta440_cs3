@@ -30,7 +30,7 @@ First, we will provide background on the elections and our data. Then, we will d
 
 # Background and Data
 ## Election Overview
-On November 3, 2020, all 50 states will hold congressional elections for their respective Representatives as well as the presidential election between Donald Trump and Joe Biden. The senate currently has 53 Republican seats of 100 total seats, and senatorial elections across many states will determine 35 seats, 23 of which are currently under Republican control [1]. Overall, this election is clearly unprecedented due to the current pandemic since the “most severe pandemic in recent history” - the 1918 influenza - was over a century ago and not during a presidential election year [2]. It will be interesting to see if the dramatic increase in mail-in voting will favor different candidates or political parties. 
+On November 3, 2020, all 50 states will hold congressional elections for their respective Representatives as well as the presidential election between Donald Trump and Joe Biden. The senate currently has 53 Republican seats of 100 total seats, and senatorial elections across many states will determine 35 seats, 23 of which are currently under Republican control [[1]][Bibliography]. Overall, this election is clearly unprecedented due to the current pandemic since the “most severe pandemic in recent history” - the 1918 influenza - was over a century ago and not during a presidential election year [[2]][Bibliography]. It will be interesting to see if the dramatic increase in mail-in voting will favor different candidates or political parties. 
 
 ## Polling Data
 We use polls extensively in nearly all our models. Specifically, we use FiveThirtyEight’s polling data for the presidential and US Senate races. We did not end up using these data for North Carolina’s elections for the House of Representatives since there were only three of thirteen districts with polls, and each of these districts only had two to four polls. 
@@ -155,8 +155,6 @@ gridExtra::grid.arrange(s1,n0, ncol=2)
 ```
 
 
-
-
 ## Electoral College Model
 
 The Linzer model is a Bayesian forecast model that specifies how preferences evolve over time and how events are noisy measurements of the underlying preferences.
@@ -207,7 +205,7 @@ We predict that Republican Thom Tillis will win 45.6% of the two-party vote-shar
 
 The residual plots for this model show a random scatter around zero, and the qq plot of residuals shows that they are also approximately normally distributed. 
 
-However, when using the 2016 election as an out-of-sample validation, we predict that the Republican candidate would win 45.6% of the popular vote, with a 95% prediction interval from 40.4% to 50.7%. However, in reality, Republican candidate Richard Burr won the race with 51.1% of the popular vote, and Democratic candidate Deborah K. Ross fell with only 45.4% of the vote [4]. This meant that he won 53.0% of the two-party share vote. Thus, our model doesn't hold up perfectly in this out of sample validation. 
+However, when using the 2016 election as an out-of-sample validation, we predict that the Republican candidate would win 45.6% of the popular vote, with a 95% prediction interval from 40.4% to 50.7%. However, in reality, Republican candidate Richard Burr won the race with 51.1% of the popular vote, and Democratic candidate Deborah K. Ross fell with only 45.4% of the vote [[4]][Bibliography]. This meant that he won 53.0% of the two-party share vote. Thus, our model doesn't hold up perfectly in this out of sample validation. 
 
 For additional sensitivity analysis, we can compare our senate estimates from this model to the ones that we used to factor into our US Senate model. In the Linzer model, North Carolina was predicted to have a 47.9% chance of going Republican, with interval 46.0% to 50.0%. This interval is contained within the interval we calculated from our NC Senate model, indicating that the two model predictions converge, albeit the variance is higher for the NC Senate model. 
 
@@ -235,12 +233,10 @@ One common limitation across all models was the quality of the data. As polling 
 Another prominent limitation in our Linzer models is that is a consequence of the quality of the data was the unrealistic weightage of polls closer to the election. There is a significant increase in influence that recent polls have on the predictions of the linzer model, which is perhaps why our results for the senate and electoral college are near unanimous as the results of the most recent poll before the election would have a heavy influence on the predictions made by the Linzer model. 
 
 # Bibliography
-TODO: update to real citations, sort alphabetically, and fix numbers throughout report
-[1] https://www.270towin.com/2020-senate-election/
-[2] https://www.cdc.gov/flu/pandemic-resources/1918-pandemic-h1n1.html#:~:text=The%201918%20influenza%20pandemic%20was,spread%20worldwide%20during%201918%2D1919
-[3] …
-[4] https://en.wikipedia.org/wiki/2016_United_States_Senate_election_in_North_Carolina
-[5] https://en.wikipedia.org/wiki/2016_United_States_House_of_Representatives_elections_in_North_Carolina
+[1] 2020 Senate Election Interactive Map. (n.d.). Retrieved from https://www.270towin.com/2020-senate-election/
+[2] 1918 Pandemic (H1N1 virus). (2019, March 20). Retrieved from https://www.cdc.gov/flu/pandemic-resources/1918-pandemic-h1n1.html#:~:text=The 1918 influenza pandemic was,spread worldwide during 1918-1919
+[3] 2016 United States Senate election in North Carolina. (2020, July 31). Retrieved from https://en.wikipedia.org/wiki/2016_United_States_Senate_election_in_North_Carolina
+[4] 2016 United States House of Representatives elections in North Carolina. (2020, August 16). Retrieved from https://en.wikipedia.org/wiki/2016_United_States_House_of_Representatives_elections_in_North_Carolina
 
 
 # Appendix A: Models Used
