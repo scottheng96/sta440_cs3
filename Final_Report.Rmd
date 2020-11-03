@@ -83,7 +83,7 @@ n0 <- NC_senate %>%
   ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = pct, color = as.factor(candidate_party))) + geom_point() + scale_colour_manual(values = c("DEM" = "#123adb", "REP" = "#E01414")) + xlab("Dates by Poll") + ylab("Percentage estimate of being elected") + theme(plot.title = element_text(hjust = 0.5), , plot.caption = element_text(hjust = 0.5)) + labs(title = "Polls for Individual Senators", caption="Fig 1.5 Polls for individual Senate races labelled by part")
 ```
 
-By considering the presidential polls data, see can observe from Fig 1, we can observe how the probabilities of being elected for both candidates over time. We see that Biden has consistently had higher probabilities of being elected than Trump since April 2020, while both candidates experience similar degrees of increase in percentage during their 'Convention Bounce'. Biden appears to consistently have a mean percentage of being elected around 50% and up, and has had a recent surge during October. On the contrary, Trump's percentage estimates have largely been below 45% with a significant drop towards October. From the exploratory data analysis on national polls we can already see that Biden is projected to have an advantage over President Trump.
+By considering the presidential polls data, as seen in Fig. 1, we can observe how the probabilities of being elected for both candidates change over time. We see that Biden has consistently had higher probabilities of being elected than Trump since April 2020, while both candidates experience similar degrees of increase in percentage during their 'Convention Bounce'. Biden appears to consistently have a mean percentage of being elected around 50% and up, and has had a recent surge during October. On the contrary, Trump's percentage estimates have largely been below 45% with a significant drop towards October. From the exploratory data analysis on national polls we can already see that Biden is projected to have an advantage over President Trump.
 
 ```{r, echo=FALSE, fig.height=3, fig.width=8}
 p0
@@ -95,7 +95,6 @@ gridExtra::grid.arrange(s1,n0, ncol=2)
 ```
 
 For senate data, we look at the senate races and their probabilities for being elected (Democrat or Republican). Over the years, we can observe that there are many close senate races as seen in Fig 1.4. In Fig 1.5, we can also see the percentages for being elected into the senate for individual candidates based on their party affiliation. We can observe that overall Democratic candidates tend to have high percentages for being elected into the senate over Republican candidates, and this distinction becomes more prominent closer to the election date.
-
 
 
 # Methods 
@@ -130,17 +129,27 @@ For senate data, we look at the senate races and their probabilities for being e
 
 ## Who Votes Model
 
+### Model Purpose
+
+This model aims to predict which groups of people in North Carolina are most likely to vote based on demographic characteristics like race, gender, ethnicity, age, and county of residence. This model also factors in election year, and it can determine whether groups were more likely to vote in the 2018 midterm elections or the 2016 election. 
+
+### Model Structure
+### Estimates From Model
+
 ## Electoral College Model
-*Describe Linzer model in more detail?*
-The purpose of this model is to predict the outcome of the presidential election by looking at electoral college votes. The probability of Trump winning is calculated by looking at the percentage of times in our 1500 *check number* simulations Trump gets 270 or more electoral college votes. In modeling the overall outcome of the presidential election, this model also predicts how each state's electoral college vote will go. Each state's electoral college outcome is modeled by looking at polling data from fivethirtyeight for that state in order to predict what percent of the popular vote both Trump and Biden receieve. Whichever candidate receives a larger percentage of the popular vote receives all of the electoral votes for that state. In reality, Maine and Nebraska can have split electoral college votes instead of the all-or-nothing approach other states take, but we chose to also model these states as all-or-nothing for simplicity sake, and many other election modelers take this same approach *possibly add citation?*. 
 
-*add Beta estimates/ JAGS output for all 50 states*
+### Model Purpose
+<!-- The purpose of this model is to predict the outcome of the presidential election by looking at electoral college votes. The probability of Trump winning is calculated by looking at the percentage of times in our 1500 *check number* simulations Trump gets 270 or more electoral college votes. In modeling the overall outcome of the presidential election, this model also predicts how each state's electoral college vote will go. Each state's electoral college outcome is modeled by looking at polling data from FiveThirtyEight for that state in order to predict what percent of the popular vote both Trump and Biden receieve. Whichever candidate receives a larger percentage of the popular vote receives all of the electoral votes for that state. In reality, Maine and Nebraska can have split electoral college votes instead of the all-or-nothing approach other states take, but we chose to also model these states as all-or-nothing for simplicity sake, and many other election modelers take this same approach *possibly add citation?*.-->
 
-## US Senate Model
-*Describe Linzer model in more detail?*
+The purpose of this model is to predict the outcome of the 2020 presidential race. This is accomplished by simulating the outcome of electoral college votes for each state based on polling data and then calculating the total number of times where Trump gets 270 or more electoral votes. This percentage is our probability that Trump wins the election. 
+
+### Model Structure
+We model the percent Republican support $y_k$ for each poll $k$ under the following Bayesian model: 
+
+*FIXME*!!!!
 
 $$\begin{aligned}
-y_k \sim Binom(\pi_{i[k]j[k]},n_k) \\
+y_k \sim Binom(\beta_{i,s[k]}, \sigma^2_{y j}) \\
 logit(\pi_{ij}) = \beta_{ij} + \delta_j \\
 for \ \ j > 1: \beta_{ij} \sim N(\beta_{i,j-1}, \sigma_{\beta}^2) \\
 \delta_j \sim N(\delta_{j-1},\sigma_{\delta}^2) \\
@@ -148,12 +157,32 @@ for \ \ j = 1: \beta_{i1} \sim N(logit(h_i),s_i^2) \\
 \delta_1 = 0
 \end{aligned}$$
 
-Similar to our electoral college model, this model looks at senate race polling data from fivethirtyeight in order to predict the outcome of all current US senate races. The data was filtered to only include general election polling data, so in other words all jungle primary or runoff election polls were removed. Additionally, the data was filtered to only include polls less than a year out from the election. Lastly, polling data for third-parties was filtered out with one exception. Ricky Dale Harrington was an independent, but he was recoded to be a Democrat in our dataset. We did this because the few independents currently in Congress lately tend to vote with Democrats, and he was the only Independent in the dataset that was predicted to get a majority of votes in one of these senate races. After filtering, we were left with data for all states where senate elections were being held except for Arkansas, Rhode Island, South Dakota, West Virginia, Wyoming, Louisiana, and the second Georgia Race. However, most of these races were predicted to be blowout races, with Arkansas, South Dakota, West Virginia, Wyoming, and Louisiana deemed as safely Republican and Rhode Island deemed safe Democrat. Since this is the case, we counted these states as a corresponding Republican or Democratic win in each of our simulations. Georgia was the only race we were missing data for that seemed close, but we chose to use the Georgia predictions generated from the other Georgia race we did have data on, since senators are elected by the whole state and it is likely that the same people are voting for both senators. After making predictions for each individual race, we aggregate the results and look at the percentage of times where Republicans win more than 21 seats, where 21 is the number of seats Rebulicans need to win in order to have a 50/50 Republican/Democrat split in the senate. 
+### Estimates From Model
 
+*add Beta estimates/ JAGS output for all 50 states*
+
+## US Senate Model
+
+### Model Purpose
+
+This model predicts the probability that the senate will remain in Republican control. This is accomplished by simulating the outcomes of all 35 senate races based on polling data and calculating the total number of times where Republicans win more than 21 of these seats, as 21 is the number of seats where the senate remains in a 50/50 Democrat/Republican split. The percentage of our simulations that have Republicans winning over 21 seats is the probability that they will keep control of the senate.
+
+### Model Structure
+
+
+### Estimates From Model
 *add Beta estimates/ JAGS output*
 
 ## North Carolina Senate Model
 
+### Model Purpose
+<!-- Similar to our electoral college model, this model looks at senate race polling data from fivethirtyeight in order to predict the outcome of all current US senate races. The data was filtered to only include general election polling data, so in other words all jungle primary or runoff election polls were removed. Additionally, the data was filtered to only include polls less than a year out from the election. Lastly, polling data for third-parties was filtered out with one exception. Ricky Dale Harrington was an independent, but he was recoded to be a Democrat in our dataset. We did this because the few independents currently in Congress lately tend to vote with Democrats, and he was the only Independent in the dataset that was predicted to get a majority of votes in one of these senate races. After filtering, we were left with data for all states where senate elections were being held except for Arkansas, Rhode Island, South Dakota, West Virginia, Wyoming, Louisiana, and the second Georgia Race. However, most of these races were predicted to be blowout races, with Arkansas, South Dakota, West Virginia, Wyoming, and Louisiana deemed as safely Republican and Rhode Island deemed safe Democrat. Since this is the case, we counted these states as a corresponding Republican or Democratic win in each of our simulations. Georgia was the only race we were missing data for that seemed close, but we chose to use the Georgia predictions generated from the other Georgia race we did have data on, since senators are elected by the whole state and it is likely that the same people are voting for both senators. After making predictions for each individual race, we aggregate the results and look at the percentage of times where Republicans win more than 21 seats, where 21 is the number of seats Rebulicans need to win in order to have a 50/50 Republican/Democrat split in the senate.  -->
+
+The purpose of this model is to predict the outcome of the 13 races in North Carolina that will determine who gets elected to the US House of Representatives.
+In order to achieve this prediction, we use the percentage of Republican votes (out of all Democratic and Republic votes in a given county) as our response variable as a proxy for the number of people we expect to vote Republican, and predictor variables include economic, race, and education data from the North Carolina Census. 
+
+### Model Structure
+We used a linear model with a random effect for county.
 
 $$\begin{aligned}
 Republican \ Share_{i} = \alpha_{i} + \beta_{travel\ time_i} + \beta_{foreign \ share_i} + \beta_{single \ parent \
@@ -164,18 +193,25 @@ where \ \alpha_{i} \sim N(\gamma_0, \tau^2)  \\
 and \ \epsilon_{i} \sim N(0, \sigma^2)
 \end{aligned}$$
 
-i represents a given county.
+where $i$ represents a given county. The republican share for a district $j$ is then calculated as 
+$$Republican \ District_{j} = \sum_{i \in counties_j} t^*_i $$
+where $$counties_j$$ is the set of counties in district $j$, and $$t^*_i = \begin{cases} t_i && split_i \\ t_i / 2 && \lnot split_i \end{cases}$$, where $$t_i$$ is the total number of voters in county $i$ and $$split_i$$ is a boolean of whether county $i$ is divided into two districts. Each split county was examined individually and looked geographically split in half for each district, so dividing the total by 2 is a reasonable approximation we can make with our given data. The Republican was considered to win the district if $$Republican \ District_{j} > 0.5$$.
 
-## North Carolina House Model
+### Estimates From Model
+*print out prediction table*
 
-$$\begin{aligned}
-Republican \ Share_{i} = \alpha_{i} + \beta_{travel\ time_i} + \beta_{foreign \ share_i} + \beta_{single \ parent \
- share_i} + \\
- \beta_{fraction \ college_i} + \beta_{poor \ share_i} + \beta_{two \ bed \ rent_i} + \beta_{job \ growth_i} + \\ 
- \beta_{share \ white_i} + \beta_{share \ black_i} + \beta_{share \ hispanic_i} + \beta_{share \ asian_i} +  \epsilon_{i} \\ 
-where \ \alpha_{i} \sim N(\gamma_0, \tau^2)  \\ 
-and \ \epsilon_{i} \sim N(0, \sigma^2)
-\end{aligned}$$
+## North Carolina Senate Model
+
+### Model Purpose
+
+The purpose of this model is to predict the outcome of the North Carolina senate race between Democrat Cal Cunningham and Republican Thom Tillis.
+Predictor variables are the same as those in the model above, and similarly, we use the percentage of Republican votes (out of all Democratic and Republic votes in a given county) as our response variable as a proxy for the number of people we expect to vote for Thom Tillis.
+
+### Model Structure
+See the NC House Model from above. We calculated the overall Republican share for all districts simply as $Tillis = \sum_{j=1}^{13} Republican \ District_{j}$. Tillis was considered to win the election if $$Tillis > 0.5$$.
+
+### Estimates From Model
+*print out prediction table* 
 
 
 # Appendix B: Data Sources 
