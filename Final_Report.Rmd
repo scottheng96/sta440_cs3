@@ -244,37 +244,38 @@ TODO: update to real citations, sort alphabetically, and fix numbers throughout 
 
 
 # Appendix A: Models Used
-<!-- Numbered list of all models/modeling procedures, with explicit details about model purpose, model structure (models written out using equations!), and resulting estimates from each model (raw output is fine for this appendix). Reproducible code and data should also be uploaded to Sakai. -->
 
-## Who Votes Model
+## 1. Who Votes Model
 
 ### Model Purpose
 
 This model aims to predict which groups of people in North Carolina are most likely to vote based on demographic characteristics like race, gender, ethnicity, age, and county of residence. This model also factors in election year, and it can determine whether groups were more likely to vote in the 2018 midterm elections or the 2016 election. 
 
-### Model Structure
-### Estimates From Model
+Please consult our Who Votes paper for more details on the model structure and our estimates. 
 
-## Electoral College Model
+## 2. Electoral College Model
 
 ### Model Purpose
-<!-- The purpose of this model is to predict the outcome of the presidential election by looking at electoral college votes. The probability of Trump winning is calculated by looking at the percentage of times in our 1500 *check number* simulations Trump gets 270 or more electoral college votes. In modeling the overall outcome of the presidential election, this model also predicts how each state's electoral college vote will go. Each state's electoral college outcome is modeled by looking at polling data from FiveThirtyEight for that state in order to predict what percent of the popular vote both Trump and Biden receieve. Whichever candidate receives a larger percentage of the popular vote receives all of the electoral votes for that state. In reality, Maine and Nebraska can have split electoral college votes instead of the all-or-nothing approach other states take, but we chose to also model these states as all-or-nothing for simplicity sake, and many other election modelers take this same approach *possibly add citation?*.-->
 
 The purpose of this model is to predict the outcome of the 2020 presidential race. This is accomplished by simulating the outcome of electoral college votes for each state based on polling data and then calculating the total number of times where Trump gets 270 or more electoral votes. This percentage is our probability that Trump wins the election. 
 
 ### Model Structure
-We model the percent Republican support $y_k$ for each poll $k$ under the following Bayesian model: 
 
-*FIXME*!!!!
-
+For a given poll $k$ and corresponding state $j$ and days before the election $t$ (based on poll end date), we model the percent Republican support $y_k$ as
 $$\begin{aligned}
-y_k \sim Binom(\beta_{i,s[k]}, \sigma^2_{y j}) \\
-logit(\pi_{ij}) = \beta_{ij} + \delta_j \\
-for \ \ j > 1: \beta_{ij} \sim N(\beta_{i,j-1}, \sigma_{\beta}^2) \\
-\delta_j \sim N(\delta_{j-1},\sigma_{\delta}^2) \\
-for \ \ j = 1: \beta_{i1} \sim N(logit(h_i),s_i^2) \\
-\delta_1 = 0
+y_k \sim N(\beta_{j, t}, \sigma^2_{y,j}) \\
+\end{aligned}$$. 
+For any $j$ and any $t>1$, we have
+$$\begin{aligned}
+\beta_{j, t} \sim N(\beta_{j, t-1}, \sigma^2_{\beta,j}) \\
+\sigma^2_{y,j} \sim IG(\nu_y, \nu_y * \tau_y) \\
+\sigma^2_{\beta,j} \sim IG(\nu_\beta, \nu_\beta * \tau_\beta) \\
 \end{aligned}$$
+and for any $j$ and $t=1$, we have
+$$\begin{aligned}
+\beta_{j, 1} \sim N(\mu_0, \sigma^2_0)
+\end{aligned}$$.
+We only consider polls ending 200 days or less before the election. We include polls from all 50 states.
 
 ### Estimates From Model
 
@@ -419,13 +420,8 @@ jags_sims_trump <- jags(data = jags_data_trump,
                   n.iter = 1000)
 ```
 
-```{r, echo = FALSE}
-jags_r$BUGSoutput
-```
-
 
 ```{r, echo = FALSE}
-#trump
 jags_r <- jags_sims_trump
 b1r <- jags_r$BUGSoutput$sims.array[1:1500]
 b10r <- jags_r$BUGSoutput$sims.array[1501:3000]
@@ -557,7 +553,11 @@ trump_electoral
 
 ```
 
-## US Senate Model
+```{r, echo = FALSE}
+jags_r$BUGSoutput
+```
+
+## 3. US Senate Model
 
 ### Model Purpose
 
@@ -565,6 +565,7 @@ This model predicts the probability that the senate will remain in Republican co
 
 ### Model Structure
 
+This model is identical to that for the electoral college, except only a subset of the states and we consider polls ending 364 days or less before the election.
 
 ### Estimates From Model
 ```{r, echo = FALSE}
@@ -592,7 +593,6 @@ d_pct = polls_not_republican$pct
 
 polls_republican$rep_pct = 100*r_pct/(r_pct + d_pct)
 ```
-
 
 
 ```{r, echo = FALSE}
@@ -691,7 +691,6 @@ b9r <- jags_r$BUGSoutput$sims.array[43501:45000]
 jags_r$BUGSoutput
 ```
 
-
 ```{r, echo = FALSE}
 w1 = ifelse(b1r > 50, 1, 0)
 w2 = ifelse(b2r > 50, 1, 0)
@@ -747,71 +746,8 @@ repub_senate
 #hist(r_wins$total)
 ```
 
-## North Carolina Senate Model
 
-### Model Purpose
-<!-- Similar to our electoral college model, this model looks at senate race polling data from fivethirtyeight in order to predict the outcome of all current US senate races. The data was filtered to only include general election polling data, so in other words all jungle primary or runoff election polls were removed. Additionally, the data was filtered to only include polls less than a year out from the election. Lastly, polling data for third-parties was filtered out with one exception. Ricky Dale Harrington was an independent, but he was recoded to be a Democrat in our dataset. We did this because the few independents currently in Congress lately tend to vote with Democrats, and he was the only Independent in the dataset that was predicted to get a majority of votes in one of these senate races. After filtering, we were left with data for all states where senate elections were being held except for Arkansas, Rhode Island, South Dakota, West Virginia, Wyoming, Louisiana, and the second Georgia Race. However, most of these races were predicted to be blowout races, with Arkansas, South Dakota, West Virginia, Wyoming, and Louisiana deemed as safely Republican and Rhode Island deemed safe Democrat. Since this is the case, we counted these states as a corresponding Republican or Democratic win in each of our simulations. Georgia was the only race we were missing data for that seemed close, but we chose to use the Georgia predictions generated from the other Georgia race we did have data on, since senators are elected by the whole state and it is likely that the same people are voting for both senators. After making predictions for each individual race, we aggregate the results and look at the percentage of times where Republicans win more than 21 seats, where 21 is the number of seats Rebulicans need to win in order to have a 50/50 Republican/Democrat split in the senate.  -->
-
-The purpose of this model is to predict the outcome of the 13 races in North Carolina that will determine who gets elected to the US House of Representatives.
-In order to achieve this prediction, we use the percentage of Republican votes (out of all Democratic and Republic votes in a given county) as our response variable as a proxy for the number of people we expect to vote Republican, and predictor variables include economic, race, and education data from the North Carolina Census. 
-
-### Model Structure
-We used a linear model with a random effect for county.
-
-$$\begin{aligned}
-Republican \ Share_{i} = \alpha_{i} + \beta_{travel\ time_i} + \beta_{foreign \ share_i} + \beta_{single \ parent \
- share_i} + \\
- \beta_{fraction \ college_i} + \beta_{poor \ share_i} + \beta_{two \ bed \ rent_i} + \beta_{job \ growth_i} + \\ 
- \beta_{share \ white_i} + \beta_{share \ black_i} + \beta_{share \ hispanic_i} + \beta_{share \ asian_i} + \\ \beta_{incumbent \ party \ Republican_i} + \beta_{incumbent \ party \ None_i} +\epsilon_{i} \\ 
-where \ \alpha_{i} \sim N(\gamma_0, \tau^2)  \\ 
-and \ \epsilon_{i} \sim N(0, \sigma^2)
-\end{aligned}$$
-
-where $i$ represents a given county. The republican share for a district $j$ is then calculated as 
-$$Republican \ District_{j} = \sum_{i \in counties_j} t^*_i $$
-where $counties_j$ is the set of counties in district $j$, and $t^*_i = \frac{t_i}{2 I(split_i)}$, where $t_i$ is the total number of voters in county $i$, $I$ is the indicator function, and $split_i$ is a boolean of whether county $i$ is divided into two districts. Each split county was examined individually and looked geographically split in half for each district, so dividing the total by 2 is a reasonable approximation we can make with our given data. The Republican was considered to win the district if $Republican \ District_{j} > 0.5$.
-
-### Estimates From Model
-```{r}
-# estimate percentages across whole state
-
-M4 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2016, control = lmerControl(optimizer ="Nelder_Mead"))
-summary(M4)
-coef(M4)
-
-PI <- predictInterval(merMod = M4, newdata = full_counties,
-                        level = 0.95, n.sims = 1000,
-                        stat = "median", type="linear.prediction",
-                        include.resid.var = TRUE)
-
-# account for counties split into 2 districts
-modified_counties <- full_counties %>%
-  mutate(Totals = as.numeric(gsub(",","",Totals))) %>%
-  mutate(voters = case_when(split == "y" ~ Totals/2,
-                            TRUE ~ Totals))
-
-modified_counties$fit = PI$fit
-modified_counties$lower = PI$lwr
-modified_counties$upper = PI$upr
-
-# weight county vote share by number of people who voted in 2016 election
-modified_counties %>%
-  group_by(district) %>%
-  summarise(dist_share_rep = sum(fit*voters)/sum(voters),
-            dist_lwr_rep = sum(lower*voters)/sum(voters),
-            dist_upr_rep = sum(upper*voters)/sum(voters))
-
-modified_counties %>%
-  summarise(dist_share_rep = sum(fit*voters)/sum(voters),
-            dist_lwr_rep = sum(lower*voters)/sum(voters),
-            dist_upr_rep = sum(upper*voters)/sum(voters))
-
-```
-
-
-
-
-## North Carolina Senate Model
+## 4. North Carolina Senate Model
 
 ### Model Purpose
 
@@ -835,8 +771,6 @@ We calculated the overall Republican share for all districts simply as $$Tillis 
 ```{r, echo = F}
 # linear mixed model with random effect for county
 M3 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 +  incumbent_party + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2018, control = lmerControl(optimizer ="Nelder_Mead"))
-summary(M3)
-coef(M3)
 
 PI <- predictInterval(merMod = M3, newdata = full_counties,
                         level = 0.95, n.sims = 1000,
@@ -861,10 +795,129 @@ modified_counties %>%
             dist_upr_rep = sum(upper*voters)/sum(voters))
 ```
 
+## 5. North Carolina House Model
 
+### Model Purpose
+
+The purpose of this model is to predict the outcome of the 13 races in North Carolina that will determine who gets elected to the US House of Representatives. In order to achieve this prediction, we used the percentage of registered Republicans in a given county as our response variable as a proxy for the number of people we expect to vote Republican, and predictor variables include economic, race, and education data from the North Carolina Census. 
+
+### Model Structure
+We used a linear model with a random effect for county.
+
+$$\begin{aligned}
+Republican \ Share_{i} = \alpha_{i} + \beta_{travel\ time_i} + \beta_{foreign \ share_i} + \beta_{single \ parent \
+ share_i} + \\
+ \beta_{fraction \ college_i} + \beta_{poor \ share_i} + \beta_{two \ bed \ rent_i} + \beta_{job \ growth_i} + \\ 
+ \beta_{share \ white_i} + \beta_{share \ black_i} + \beta_{share \ hispanic_i} + \beta_{share \ asian_i} + \\ \beta_{incumbent \ party \ Republican_i} + \beta_{incumbent \ party \ None_i} +\epsilon_{i} \\ 
+where \ \alpha_{i} \sim N(\gamma_0, \tau^2)  \\ 
+and \ \epsilon_{i} \sim N(0, \sigma^2)
+\end{aligned}$$
+
+where $i$ represents a given county. The republican share for a district $j$ is then calculated as 
+$$Republican \ District_{j} = \sum_{i \in counties_j} t^*_i $$
+where $counties_j$ is the set of counties in district $j$, and $t^*_i = \frac{t_i}{2 I(split_i)}$, where $t_i$ is the total number of voters in county $i$, $I$ is the indicator function, and $split_i$ is a boolean of whether county $i$ is divided into two districts. Each split county was examined individually and looked geographically split in half for each district, so dividing the total by 2 is a reasonable approximation we can make with our given data. The Republican was considered to win the district if $Republican \ District_{j} > 0.5$.
+
+### Estimates From Model
+```{r, echo = FALSE}
+# estimate percentages across whole state
+
+M4 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2018, control = lmerControl(optimizer ="Nelder_Mead"))
+
+PI <- predictInterval(merMod = M4, newdata = full_counties,
+                        level = 0.95, n.sims = 1000,
+                        stat = "median", type="linear.prediction",
+                        include.resid.var = TRUE)
+
+# account for counties split into 2 districts
+modified_counties <- full_counties %>%
+  mutate(Totals = as.numeric(gsub(",","",Totals))) %>%
+  mutate(voters = case_when(split == "y" ~ Totals/2,
+                            TRUE ~ Totals))
+
+modified_counties$fit = PI$fit
+modified_counties$lower = PI$lwr
+modified_counties$upper = PI$upr
+
+# weight county vote share by number of people who voted in 2016 election
+
+modified_counties %>%
+  summarise(dist_share_rep = sum(fit*voters)/sum(voters),
+            dist_lwr_rep = sum(lower*voters)/sum(voters),
+            dist_upr_rep = sum(upper*voters)/sum(voters))
+
+```
 
 # Appendix B: Data Sources 
-<!-- List of all data sets/data sources used, along with an explicit mapping from the models in Appendix A to the variables used from Appendix B in each model. -->
+NC Voter Data: 
+Used in North Carolina House Model and Who Votes in North Carolina Model
+Variables used: % of people registered as Republicans in 2016 and 2018
+Used in Who Votes model???
+https://dl.ncsbe.gov/?prefix=data/
+
+Mapping for Who Votes:
+```{r fig.align="center", echo=FALSE, warning=FALSE}
+features_tbl <- data.frame(
+  Metric = c(rep("n", 1),
+             rep("race", 2),
+             rep("gender",1),
+             rep("ethnicity",1),
+             rep("age group",1),
+             rep("county",1),
+             rep("presidential",1),
+             rep("party", 1)),
+  
+  Groups = linebreak(c("Number of voters",
+                       "A = Asian, B = Black or African American, I = American Indian or Native American, ", 
+                       "M = Two or more races , O = Other , U = Undesignated, W = White", 
+                       "M = Male, F = Female, U = Preferred not to respond", 
+                        "HL = Hispanic or Latino, NL = Non-hispanic/Non-Latino, UN = Undesignated",
+                       "Age groups of 18-24, 25-44, 45-64, 65+",
+                       "North Carolina's 100 counties",
+                       "0 = Midterm election, 1 = Presidential election",
+                       "DEM = Democrat, REP = Republican, CST = Constitutional, GRN = Green, LIB = Libertarian, UNA = Unaffiliated")
+  )
+)
+features_tbl %>% 
+  kable(escape=F,   booktabs = T, align = "c",
+        caption = "Table 1.1 Description Table of Data set variables",) %>%
+  kable_styling(latex_options = c("hold_position")) %>% 
+  collapse_rows(columns = 1, latex_hline = "major") %>% 
+  row_spec(0, bold = TRUE) #%>% 
+#column_spec(column = c(2), latex_column_spec = "c")
+```
+
+
+Census Data: Neighborhood characteristics by county in North Carolina 
+Used in North Carolina House and Senate Models
+Variables used: percentage of people who live 15 minutes away from where they work in a given county (2010),  percentage of people who are foreign-born in a given county (2010), the percentage of single parents in a given county (2010), the percentage of people who have at least some college education in a given county (2010), the percentage of people living below the poverty line in a given county (2010), the average rent of a two-bedroom apartment in the county (2015), the average annual job growth from 2004-2013, the share of the population that is white, black, asian, and hispanic (2010)
+https://opportunityinsights.org/data/?geographic_level=0&topic=0&paper_id=0#resource-listing
+
+Ballotpedia: 
+Used in North Carolina House Model
+Variables used: Incumbent Party for NC Congressional Races
+https://ballotpedia.org/United_States_House_of_Representatives_elections_in_North_Carolina,_2020
+
+North Carolina County Data: 
+Used in North Carolina House and Senate Models
+Variables used: What district all the counties in North Carolina are a part of
+http://speakermoore.com/new-n-c-congressional-districts-approved-state-house-representatives/
+
+North Carolina 2016 Election Data: 
+Used in North Carolina House and Senate Models
+Variables used: Total number of voters by county in 2016 presidential election
+https://en.wikipedia.org/wiki/2016_United_States_presidential_election_in_North_Carolina#:~:text=The%202016%20United%20States%20presidential,of%20the%202016%20general%20election.
+
+Fivethirtyeight senate polling data
+Used for model building (2020) and validation (2018) in US Senate Model
+Variables used: days until election, polling state, candidate party, percentage of support in poll
+
+Fivethirtyeight presidential polling data
+Used for model building in Electoral College Model
+Variables used: days until election, polling state, candidate party, percentage of support in poll
+
+2016 Economist Presidential Polling Data
+Used as validation for the Electoral College Model
+Variables used: days until election, polling state, candidate party, percentage of support in poll
 
 # Appendix C: Diagnostic Plots 
 
@@ -946,12 +999,12 @@ lapply(seq(1,length(res)), function(i) {
 ```
 
 ## Residual Plots for NC House and Senate Models
-```{r, echo = F}
+```{r, echo = F, include = F}
 plot(M4)
 qqnorm(residuals(M4))
 ```
 
-```{r, echo = F}
+```{r, echo = F, include - F}
 plot(M3)
 qqnorm(residuals(M3))
 ```
@@ -959,7 +1012,7 @@ qqnorm(residuals(M3))
 # Appendix D: Out-of-Sample Validation
 
 ## Electoral College - 2016 Election
-```{r, echo = FALSE}
+```{r, echo = FALSE, include = F}
 set.seed(2016)
 polls <- read_csv("data/2016_Economist_Polls.csv") %>% 
   filter(population %in% c("Likely Voters","Registered Voters"),question.iteration == 1) %>% #remove duplicate questions
@@ -1068,12 +1121,12 @@ jags_r <- jags(data = jags_data,model.file = model,parameters.to.save = c("beta[
 
 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, include = F}
 jags_r$BUGSoutput
 ```
 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, include = F}
 elec_votes_r <- c(9,9,3,6,11,55,9,7,3,29,16,4,4,20,11,6,8,8,4,10,11,16,10,6,10,3,15,3,4,14,5,6,6,29,3,18,7,7,20,4,9,3,11,38,6,13,3,12,10,5,3)
 
 b1r <- jags_r$BUGSoutput$sims.array[1:1500]
@@ -1198,7 +1251,7 @@ clinton_electoral
 
 ## US Senate - 2018 Election
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, include = FALSE}
 # 35 seats up 
 
 s <- read.csv(file='data/senate_polls.csv')
@@ -1233,7 +1286,7 @@ d_pct = polls_not_republican$pct
 polls_republican$rep_pct = 100*r_pct/(r_pct + d_pct)
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, inlcude = F}
 state <- polls_republican$state %>% unique
 y <- polls_republican$rep_pct
 r <- match(polls_republican$state,state)
@@ -1246,7 +1299,7 @@ jags_data_republican <- list(y=y,t=t,r=r,
 
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, inlcude = F}
 model <- function(){
   for(k in 1:N_polls){
     y[k] ~ dnorm(p[k],1/sigma2_y[r[k]]) #note no longer binomial
@@ -1282,7 +1335,7 @@ model <- function(){
 
 
 
-```{r}
+```{r, echo = F, include = F}
 set.seed(1)
 jags_r <- jags(data = jags_data_republican,
                   model.file = model,
@@ -1327,19 +1380,19 @@ b9r <- jags_r$BUGSoutput$sims.array[43501:45000]
 
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, include = F}
 jags_r$BUGSoutput
 ```
 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, inlcude = F}
 senate_1 <- read.csv(file='data/senate_polls.csv')
 senate_1 %>%
   filter(question_id == 86679 | question_id == 91111 | question_id == 90518 | question_id == 90510 | question_id == 90151 | question_id == 85923)
 ```
 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, include = F}
 w1 = ifelse(b1r > 50, 1, 0)
 w2 = ifelse(b2r > 50, 1, 0)
 w3 = ifelse(b3r > 50, 1, 0)
@@ -1395,7 +1448,7 @@ repub_senate
 ```
 
 ## NC Senate - 2016 Election
-```{r}
+```{r echo = F, include = F}
 # estimate percentages across whole state
 
 M5 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2018, control = lmerControl(optimizer ="Nelder_Mead"))
@@ -1432,7 +1485,7 @@ modified_counties %>%
 ```
 
 ## NC House of Representatives - 2016 Election
-```{r multi-level-model, echo = FALSE}
+```{r multi-level-model, echo = FALSE, include = F}
 
 
 # linear mixed model with random effect for county
@@ -1443,7 +1496,7 @@ coef(M2)
 ```
 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, include= F}
 PI <- predictInterval(merMod = M2, newdata = full_counties,
                         level = 0.95, n.sims = 1000,
                         stat = "median", type="linear.prediction",
