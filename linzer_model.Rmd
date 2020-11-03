@@ -538,9 +538,9 @@ clinton_electoral
 
 ## Traceplots
     
-```{r, echo = FALSE, message=FALSE, warning=FALSE, include=FALSE}
+```{r}
 # run traceplots
-parameters = c(names(data.frame(jags_sims_trump$BUGSoutput$sims.matrix)))[1:5]
+parameters = c(names(data.frame(jags_sims_trump$BUGSoutput$sims.matrix)))[1:56]
 
 res = data.frame(jags_sims_trump$BUGSoutput$sims.matrix)[,parameters]
 
@@ -551,6 +551,7 @@ tps <- function(var){
          x ="Iterations", y = as.name(var))
 }
 lapply(names(res), tps)
+
 ```
 
 ## Lag-1 Scatterplots

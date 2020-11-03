@@ -195,7 +195,46 @@ repub_senate
 hist(r_wins$total)
 ```
 
+## Traceplots
+    
+```{r}
+# run traceplots
+parameters = c(names(data.frame(jags_r$BUGSoutput$sims.matrix)))[1:31]
 
+res = data.frame(jags_r$BUGSoutput$sims.matrix)[,parameters]
+
+tps <- function(var){
+  ggplot(res, aes_(y=as.name(var), x=seq(1,nrow(res)))) +
+    geom_line() +
+    labs(title=paste("Traceplot of ", as.name(var)),
+         x ="Iterations", y = as.name(var))
+}
+lapply(names(res), tps)
+```
+
+## Lag-1 Scatterplots
+
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
+# run lag-1 scatterplots
+library(ggplot2)
+res_lag1 = lapply(seq(1:length(res)), function(i) {
+  lres = lag(res[,i],1)
+  plot(y=res[,i], x= lres, 
+       xlab = paste0(colnames(res)[i], "-1"),
+       ylab = paste0(colnames(res)[i]),
+       main = paste("Lag-1 Scatter Plot of", colnames(res)[i]))
+})
+```
+
+## ACF plots
+
+```{r, echo = F, message=FALSE, warning=FALSE}
+# run acf plots
+lapply(seq(1,length(res)), function(i) { 
+  acf(res[,i], xlab = "Lag", ylab = "ACF", 
+            main = paste("ACF Plot of ", colnames(res)[i]))
+})
+```
 
 # Validation on 2018 senate race WITH STANDARDIZATION
 ```{r}
