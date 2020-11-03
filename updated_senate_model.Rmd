@@ -192,7 +192,7 @@ repub_senate <- r_wins%>%
 
 repub_senate
 
-hist(r_wins$total)
+#hist(r_wins$total)
 ```
 
 ## Traceplots

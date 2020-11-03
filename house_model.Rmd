@@ -12,6 +12,7 @@ house_data <- read.csv(file='data/house_polls.csv')
 nc_house <- house_data %>%
   filter(state == "North Carolina") %>%
   filter(candidate_party == "REP" | candidate_party == "DEM")
+
 county_data <- read.csv(file = 'data/cty_covariates.csv') %>%
   filter(state == 37)
 nc_counties <- read.csv(file = 'data/nc_county_data.csv')
@@ -26,10 +27,6 @@ full_counties <- full_join(full_counties, nc_2016_data, by = "county")
 ```{r}
 rep2016 <- read.csv(file='data/NC-counties-percent-republican-2016.csv')
 rep2018 <- read.csv(file='data/NC-counties-percent-republican-2018.csv')
-```
-
-```{r}
-pairs(Republican.percentage, traveltime15_2010, foreign_share2010,  singleparent_share2010, frac_coll_plus2010, poor_share2010, rent_twobed2015, ann_avg_job_growth_2004_2013, share_white2010, share_black2010, share_hisp2010, share_asian2010, data = rep2018)
 ```
 
 
@@ -96,9 +93,14 @@ rep2016 <- rep2016 %>%
 ```
 
 
-```{r multi-level-model}
+```{r}
 library(lme4)
 library(merTools)
+```
+
+
+```{r multi-level-model}
+
 
 # linear mixed model with random effect for county
 M2 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 +  incumbent_party + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2016, control = lmerControl(optimizer ="Nelder_Mead"))
@@ -140,11 +142,11 @@ qqnorm(residuals(M2))
 
 ```{r}
 # linear mixed model with random effect for county
-M2 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 +  incumbent_party + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2018, control = lmerControl(optimizer ="Nelder_Mead"))
-summary(M2)
-coef(M2)
+M3 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 +  incumbent_party + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2018, control = lmerControl(optimizer ="Nelder_Mead"))
+summary(M3)
+coef(M3)
 
-PI <- predictInterval(merMod = M2, newdata = full_counties,
+PI <- predictInterval(merMod = M3, newdata = full_counties,
                         level = 0.95, n.sims = 1000,
                         stat = "median", type="linear.prediction",
                         include.resid.var = TRUE)
@@ -168,8 +170,8 @@ modified_counties %>%
 ```
 
 ```{r}
-plot(M2)
-qqnorm(residuals(M2))
+plot(M3)
+qqnorm(residuals(M3))
 ```
 
 
@@ -177,11 +179,11 @@ qqnorm(residuals(M2))
 ```{r}
 # estimate percentages across whole state
 
-M2 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2016, control = lmerControl(optimizer ="Nelder_Mead"))
-summary(M2)
-coef(M2)
+M4 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2016, control = lmerControl(optimizer ="Nelder_Mead"))
+summary(M4)
+coef(M4)
 
-PI <- predictInterval(merMod = M2, newdata = full_counties,
+PI <- predictInterval(merMod = M4, newdata = full_counties,
                         level = 0.95, n.sims = 1000,
                         stat = "median", type="linear.prediction",
                         include.resid.var = TRUE)
@@ -211,18 +213,18 @@ modified_counties %>%
 ```
 
 ```{r}
-plot(M2)
-qqnorm(residuals(M2))
+plot(M4)
+qqnorm(residuals(M4))
 ```
 
 ```{r}
 # estimate percentages across whole state
 
-M2 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2018, control = lmerControl(optimizer ="Nelder_Mead"))
-summary(M2)
-coef(M2)
+M5 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2018, control = lmerControl(optimizer ="Nelder_Mead"))
+summary(M5)
+coef(M5)
 
-PI <- predictInterval(merMod = M2, newdata = full_counties,
+PI <- predictInterval(merMod = M5, newdata = full_counties,
                         level = 0.95, n.sims = 1000,
                         stat = "median", type="linear.prediction",
                         include.resid.var = TRUE)
@@ -251,7 +253,7 @@ modified_counties %>%
 
 ```
 ```{r}
-plot(M2)
-qqnorm(residuals(M2))
+plot(M5)
+qqnorm(residuals(M5))
 ```
 
