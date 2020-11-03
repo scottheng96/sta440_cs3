@@ -155,7 +155,7 @@ p1
 ```{r, echo=FALSE, fig.height=4, fig.width=8}
 p2
 ```
-For senate data, we look at the senate races and their probabilities for being elected (Democrat or Republican). Over the years, we can observe that there are many close senate races as seen in Fig 1.4. In Fig 1.5, we can also see the percentages for being elected into the senate for individual candidates based on their party affiliation. We can observe that overall Democratic candidates tend to have high percentages for being elected into the senate over Republican candidates, and this distinction becomes more prominent closer to the election date.
+For senate data, we look at the senate races and their probabilities for being elected (Democrat or Republican). We can observe that overall Democratic candidates tend to have high percentages for being elected into the senate over Republican candidates, and this distinction becomes more prominent closer to the election date.  In Fig 1.5, we can also see the percentages for the Republican incumbent Tillis and Democratic opposer Cunningham in the NC Senate race. The vertical black line represents October 3, the day Tillis tested positive for COVID-19 and Cunningham admitted sending extramarital romantic texts (soon after proven to be part of an affair). It appears polls ending after this date are unaffected by these developments, so perhaps the polls are missing the state's true sentiment towards the developments.
 
 ```{r, echo=FALSE, fig.width = 13, fig.height = 4}
 gridExtra::grid.arrange(s1,n0, ncol=2)
