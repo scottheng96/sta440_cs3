@@ -28,6 +28,10 @@ rep2016 <- read.csv(file='data/NC-counties-percent-republican-2016.csv')
 rep2018 <- read.csv(file='data/NC-counties-percent-republican-2018.csv')
 ```
 
+```{r}
+pairs(Republican.percentage, traveltime15_2010, foreign_share2010,  singleparent_share2010, frac_coll_plus2010, poor_share2010, rent_twobed2015, ann_avg_job_growth_2004_2013, share_white2010, share_black2010, share_hisp2010, share_asian2010, data = rep2018)
+```
+
 
 ```{r census-EDA}
 hist(full_counties$Trump.percentage)
