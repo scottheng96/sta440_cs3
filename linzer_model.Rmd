@@ -97,6 +97,7 @@ model <- function(){
 
 ```{r run_model,eval=TRUE}
 #be sure to add your added parameters to parameters.to.save
+set.seed(2020)
 jags_sims_trump <- jags(data = jags_data_trump,
                   model.file = model,
                   parameters.to.save = c("beta[1,1]",
@@ -263,7 +264,7 @@ w45 = ifelse(b45r > 50, 11, 0) # IN
 w46 = ifelse(b46r > 50, 4, 0) # ID
 w47 = ifelse(b47r > 50, 4, 0) # HI
 w48 = ifelse(b48r > 50, 3, 0) # DE
-w49 = ifelse(b49r > 50, 0, 0) # DC
+w49 = ifelse(b49r > 50, 3, 0) # DC
 w50 = ifelse(b50r > 50, 7, 0) # CT
 w51 = ifelse(b51r > 50, 6, 0) # AR
 w52 = ifelse(b52r > 50, 3, 0) # AK
@@ -289,6 +290,7 @@ trump_electoral
 
 <!-- 2016 stuff -->
 ```{r}
+set.seed(2016)
 polls <- read_csv("data/2016_Economist_Polls.csv") %>% 
   filter(population %in% c("Likely Voters","Registered Voters"),question.iteration == 1) %>% #remove duplicate questions
   mutate(days_to_election = ifelse(end.date == "11/7/16", 1, ifelse(end.date == "11/6/16",2, ifelse(end.date == "11/5/16",3,101))),
@@ -454,62 +456,68 @@ b5r <- jags_r$BUGSoutput$sims.array[69001:70500]
 b50r <- jags_r$BUGSoutput$sims.array[70501:72000]
 b51r <- jags_r$BUGSoutput$sims.array[72001:73500]
 
-w1 = ifelse(b1r > 50, 1, 0)
-w2 = ifelse(b2r > 50, 1, 0)
-w3 = ifelse(b3r > 50, 1, 0)
-w4 = ifelse(b4r > 50, 1, 0)
-w5 = ifelse(b5r > 50, 1, 0)
-w6 = ifelse(b6r > 50, 1, 0)
-w7 = ifelse(b7r > 50, 1, 0)
-w8 = ifelse(b8r > 50, 1, 0)
-w9 = ifelse(b9r > 50, 1, 0)
-w10 = ifelse(b10r > 50, 1, 0)
-w11 = ifelse(b11r > 50, 1, 0)
-w12 = ifelse(b12r > 50, 1, 0)
-w13 = ifelse(b13r > 50, 1, 0)
-w14 = ifelse(b14r > 50, 1, 0)
-w15 = ifelse(b15r > 50, 1, 0)
-w16 = ifelse(b16r > 50, 1, 0)
-w17 = ifelse(b17r > 50, 1, 0)
-w18 = ifelse(b18r > 50, 1, 0)
-w19 = ifelse(b19r > 50, 1, 0)
-w20 = ifelse(b20r > 50, 1, 0)
-w21 = ifelse(b21r > 50, 1, 0)
-w22 = ifelse(b22r > 50, 1, 0)
-w23 = ifelse(b23r > 50, 1, 0)
-w24 = ifelse(b24r > 50, 1, 0)
-w25 = ifelse(b25r > 50, 1, 0)
-w26 = ifelse(b26r > 50, 1, 0)
-w27 = ifelse(b27r > 50, 1, 0)
-w28 = ifelse(b28r > 50, 1, 0)
-w29 = ifelse(b29r > 50, 1, 0)
-w30 = ifelse(b30r > 50, 1, 0)
-w31 = ifelse(b31r > 50, 1, 0)
-w32 = ifelse(b32r > 50, 1, 0)
-w33 = ifelse(b33r > 50, 1, 0)
-w34 = ifelse(b34r > 50, 1, 0)
-w35 = ifelse(b35r > 50, 1, 0)
-w36 = ifelse(b36r > 50, 1, 0)
-w37 = ifelse(b37r > 50, 1, 0)
-w38 = ifelse(b38r > 50, 1, 0)
-w39 = ifelse(b39r > 50, 1, 0)
-w40 = ifelse(b40r > 50, 1, 0)
-w41 = ifelse(b41r > 50, 1, 0)
-w42 = ifelse(b42r > 50, 1, 0)
-w43 = ifelse(b43r > 50, 1, 0)
-w44 = ifelse(b44r > 50, 1, 0)
-w45 = ifelse(b45r > 50, 1, 0)
-w46 = ifelse(b46r > 50, 1, 0)
-w47 = ifelse(b47r > 50, 1, 0)
-w48 = ifelse(b48r > 50, 1, 0)
-w49 = ifelse(b49r > 50, 1, 0)
-w50 = ifelse(b50r > 50, 1, 0)
-w51 = ifelse(b51r > 50, 1, 0)
+w1 = ifelse(b1r > 50, 0, 0) # US
+w2 = ifelse(b2r > 50, 3, 0) # AK
+w3 = ifelse(b3r > 50, 9, 0) # AL
+w4 = ifelse(b4r > 50, 11, 0) # AR
+w5 = ifelse(b5r > 50, 6, 0) # AZ
+w6 = ifelse(b6r > 50, 55, 0) # CA
+w7 = ifelse(b7r > 50, 9, 0) # CO
+w8 = ifelse(b8r > 50, 7, 0) # CT
+w9 = ifelse(b9r > 50, 3, 0) # DE
+w10 = ifelse(b10r > 50, 29, 0) # FL
+w11 = ifelse(b11r > 50, 16, 0) # GA
+w12 = ifelse(b12r > 50, 4, 0) # HI
+w13 = ifelse(b13r > 50, 6, 0) # IA
+w14 = ifelse(b14r > 50, 4, 0) # ID
+w15 = ifelse(b15r > 50, 20, 0) # IL
+w16 = ifelse(b16r > 50, 11, 0) # IN
+w17 = ifelse(b17r > 50, 6, 0) # KS
+w18 = ifelse(b18r > 50, 8, 0) # KY
+w19 = ifelse(b19r > 50, 8, 0) # LA
+w20 = ifelse(b20r > 50, 11, 0) # MA
+w21 = ifelse(b21r > 50, 10, 0) # MD
+w22 = ifelse(b22r > 50, 4, 0) # ME
+w23 = ifelse(b23r > 50, 16, 0) # MI
+w24 = ifelse(b24r > 50, 10, 0) # MN
+w25 = ifelse(b25r > 50, 10, 0) # MO
+w26 = ifelse(b26r > 50, 6, 0) # MS 
+w27 = ifelse(b27r > 50, 3, 0) # MT
+w28 = ifelse(b28r > 50, 15, 0) # NC
+w29 = ifelse(b29r > 50, 3, 0) # ND
+w30 = ifelse(b30r > 50, 5, 0) # NE
+w31 = ifelse(b31r > 50, 4, 0) # NH
+w32 = ifelse(b32r > 50, 14, 0) # NJ
+w33 = ifelse(b33r > 50, 5, 0) # NM
+w34 = ifelse(b34r > 50, 6, 0) # NV
+w35 = ifelse(b35r > 50, 29, 0) # NY
+w36 = ifelse(b36r > 50, 18, 0) # OH
+w37 = ifelse(b37r > 50, 7, 0) # OK
+w38 = ifelse(b38r > 50, 7, 0) # OR
+w39 = ifelse(b39r > 50, 20, 0) # PA
+w40 = ifelse(b40r > 50, 4, 0) # RI
+w41 = ifelse(b41r > 50, 9, 0) # SC
+w42 = ifelse(b42r > 50, 3, 0) # SD
+w43 = ifelse(b43r > 50, 11, 0) # TN
+w44 = ifelse(b44r > 50, 38, 0) # TX
+w45 = ifelse(b45r > 50, 6, 0) # UT
+w46 = ifelse(b46r > 50, 13, 0) # VA
+w47 = ifelse(b47r > 50, 3, 0) # VT
+w48 = ifelse(b48r > 50, 12, 0) # WA
+w49 = ifelse(b49r > 50, 10, 0) # WI
+w50 = ifelse(b50r > 50, 5, 0) # WV
+w51 = ifelse(b51r > 50, 3, 0) # WY
 
 r_wins <- data.frame(cbind(w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14, w15, w16, w17, w18, w19, w20, w21, w22, w23, w24, w25, w26, w27, w28, w29, w30, w31,w32,w33,w34,w35,w36,w37,w38,w39,w40,w41,w42,w43,w44,w45,w46,w47,w48,w49,w50,w51))
-```
 
-```{r}
-r_matrix <- as.matrix(r_wins)
-r_matrix %*% elec_votes_r
+n = nrow(r_wins)
+
+r_wins$total = rowSums(r_wins)
+
+clinton_electoral <- r_wins%>%
+  filter(total > 269) %>%
+  summarise(perc = n()/nrow(r_wins)) %>%
+  pull()
+
+clinton_electoral
 ```
