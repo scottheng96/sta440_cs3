@@ -126,8 +126,10 @@ p2 <- presidential_poll_averages_2020 %>%
 ```{r senate-race-polls, include = FALSE}
 s1 <- senate_polls %>%
   filter(candidate_party == "DEM" | candidate_party == "REP") %>%
+  filter(cycle == 2020) %>%
   filter(state == "Minnesota" | state == "Michigan" | state == "Arizona" | state == "Colorado" | state == "North Carolina" | state == "Maine" | state == "Iowa" | state == "Montana" | state == "Georgia" | state == "Kansas" | state == "South Carolina" | state == "Alabama" |state == "Alaska" |state == "Texas") %>%
-  ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = pct, color = candidate_party)) + geom_line() + facet_wrap(~race_id) + labs(title = "Polls by closer senate races", caption="Fig 1.4 Polls by closer senate races") + scale_colour_manual(values = c("DEM" = "#123adb", "REP" = "#E01414")) + xlab("Dates by Year") + ylab("Percentage estimate of being elected") + theme(plot.title = element_text(hjust = 0.5), , plot.caption = element_text(hjust = 0.5))
+  ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = pct, color = candidate_party)) + geom_line() + facet_wrap(~state) + labs(title = "Polls by closer senate races", caption="Fig 1.4 Polls by closer senate races") + scale_colour_manual(values = c("DEM" = "#123adb", "REP" = "#E01414")) + xlab("Dates by Year") + ylab("Percentage estimate of being elected") + theme(plot.title = element_text(hjust = 0.5), , plot.caption = element_text(hjust = 0.5)) + theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
 ```
 
 ```{r nc-senate-race, include = FALSE}
@@ -136,7 +138,7 @@ NC_senate <- senate_polls %>%
   filter(candidate_party == "DEM" | candidate_party == "REP")
 
 n0 <- NC_senate %>%
-  ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = pct, color = as.factor(candidate_party))) + geom_point() + scale_colour_manual(values = c("DEM" = "#123adb", "REP" = "#E01414")) + xlab("Dates by Poll") + ylab("Percentage estimate of being elected") + theme(plot.title = element_text(hjust = 0.5), , plot.caption = element_text(hjust = 0.5)) + labs(title = "Polls for Individual Senators", caption="Fig 1.5 Polls for individual Senate races labelled by part")
+  ggplot(aes(x = as.Date(end_date, format = "%m/%d/%y"), y = pct, color = as.factor(candidate_party))) + geom_point() + scale_colour_manual(values = c("DEM" = "#123adb", "REP" = "#E01414")) + xlab("Dates by Poll") + ylab("Percentage estimate of being elected") + theme(plot.title = element_text(hjust = 0.5), , plot.caption = element_text(hjust = 0.5)) + labs(title = "NC Senate Race", caption="Fig 1.5 Polls for individual Senate races labelled by part", legend = "Candidate Party") + geom_vline(xintercept=as.Date('2020-10-06'))
 ```
 
 By considering the presidential polls data, as seen in Fig. 1, we can observe how the probabilities of being elected for both candidates change over time. We see that Biden has consistently had higher probabilities of being elected than Trump since April 2020, while both candidates experience similar degrees of increase in percentage during their 'Convention Bounce'. Biden appears to consistently have a mean percentage of being elected around 50% and up, and has had a recent surge during October. On the contrary, Trump's percentage estimates have largely been below 45% with a significant drop towards October. From the exploratory data analysis on national polls we can already see that Biden is projected to have an advantage over President Trump.
@@ -146,10 +148,13 @@ p0
 ```
 However, this does not tell the full picture, as the United States Presidential Elections adopt an Electoral College system, which sometimes can allow a candidate to become President if that candidate did not receive the popular vote nationally, but secured support in key states that contain a large number of electoral votes. These states have a larger influence on the course of the elections and therefore are highly contested between the two candidates. Figure 1.2 shows the polls for both candidates by state over time, revealing which candidates have advantages over the other in certain states and which states require more attention in order to gain the people's support. Fig 1.3 shows the polls in swing states- States that have relatively equal support for either party and therefore can heavily influence the outcome of the election. For the majority of swing states, Biden similarly is favored statistically to be elected, with the exception of Iowa and Ohio.
 
-```{r, echo=FALSE, fig.width = 13, fig.height = 4}
-gridExtra::grid.arrange(p1,p2, ncol=2)
+```{r, echo=FALSE, fig.height=6, fig.width=8}
+p1
 ```
 
+```{r, echo=FALSE, fig.height=4, fig.width=8}
+p2
+```
 For senate data, we look at the senate races and their probabilities for being elected (Democrat or Republican). Over the years, we can observe that there are many close senate races as seen in Fig 1.4. In Fig 1.5, we can also see the percentages for being elected into the senate for individual candidates based on their party affiliation. We can observe that overall Democratic candidates tend to have high percentages for being elected into the senate over Republican candidates, and this distinction becomes more prominent closer to the election date.
 
 ```{r, echo=FALSE, fig.width = 13, fig.height = 4}
@@ -888,7 +893,8 @@ features_tbl %>%
         caption = "Table 1.1 Description Table of Data set variables",) %>%
   kable_styling(latex_options = c("hold_position")) %>% 
   collapse_rows(columns = 1, latex_hline = "major") %>% 
-  row_spec(0, bold = TRUE) #%>% 
+  row_spec(0, bold = TRUE)  %>% 
+  kable_styling(latex_options="scale_down")#%>% 
 #column_spec(column = c(2), latex_column_spec = "c")
 ```
 
