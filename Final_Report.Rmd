@@ -13,7 +13,7 @@ library(R2jags)
 library(lme4)
 library(merTools)
 library(kableExtra)
-library(brms)
+# library(brms)
 ```
 
 # Introduction
@@ -1004,7 +1004,7 @@ Variables used: days until election, polling state, candidate party, percentage 
 
 ### Presidential Model
     
-```{r, echo = F, include = F}
+```{r, echo = F}
 # run traceplots
 parameters = c(names(data.frame(jags_sims_trump$BUGSoutput$sims.matrix)))[1:56]
 
@@ -1020,7 +1020,7 @@ lapply(names(res), tps)
 
 ```
 
-```{r, echo = FALSE, message=FALSE, warning=FALSE, include = F}
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
 # run lag-1 scatterplots
 library(ggplot2)
 res_lag1 = lapply(seq(1:length(res)), function(i) {
@@ -1033,7 +1033,7 @@ res_lag1 = lapply(seq(1:length(res)), function(i) {
 ```
 
 
-```{r, echo = F, message=FALSE, warning=FALSE, include = F}
+```{r, echo = F, message=FALSE, warning=FALSE}
 # run acf plots
 lapply(seq(1,length(res)), function(i) { 
   acf(res[,i], xlab = "Lag", ylab = "ACF", 
@@ -1042,7 +1042,7 @@ lapply(seq(1,length(res)), function(i) {
 ```
 
 ### US Senate Model
-```{r, echo = F, include = F}
+```{r, echo = F}
 # run traceplots
 parameters = c(names(data.frame(jags_r$BUGSoutput$sims.matrix)))[1:31]
 
@@ -1057,7 +1057,7 @@ tps <- function(var){
 lapply(names(res), tps)
 ```
 
-```{r, echo = FALSE, message=FALSE, warning=FALSE, include = F}
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
 # run lag-1 scatterplots
 library(ggplot2)
 res_lag1 = lapply(seq(1:length(res)), function(i) {
@@ -1069,7 +1069,7 @@ res_lag1 = lapply(seq(1:length(res)), function(i) {
 })
 ```
 
-```{r, echo = F, message=FALSE, warning=FALSE, include = F}
+```{r, echo = F, message=FALSE, warning=FALSE}
 # run acf plots
 lapply(seq(1,length(res)), function(i) { 
   acf(res[,i], xlab = "Lag", ylab = "ACF", 
@@ -1078,12 +1078,12 @@ lapply(seq(1,length(res)), function(i) {
 ```
 
 ## Residual Plots for NC House and Senate Models
-```{r, echo = F, include = F}
+```{r, echo = F}
 plot(M4)
 qqnorm(residuals(M4))
 ```
 
-```{r, echo = F, include - F}
+```{r, echo = F}
 plot(M3)
 qqnorm(residuals(M3))
 ```
@@ -1091,7 +1091,7 @@ qqnorm(residuals(M3))
 # Appendix D: Out-of-Sample Validation
 
 ## Electoral College - 2016 Election
-```{r, echo = FALSE, include = F, message = F, include = F}
+```{r, echo = FALSE,include=F, message = F}
 set.seed(2016)
 polls <- read_csv("data/2016_Economist_Polls.csv") %>% 
   filter(population %in% c("Likely Voters","Registered Voters"),question.iteration == 1) %>% #remove duplicate questions
@@ -1458,7 +1458,7 @@ jags_r$BUGSoutput
 ```
 
 
-```{r, echo = FALSE, include = F, message = F, warning = F}
+```{r, echo = FALSE, message = F, warning = F}
 w1 = ifelse(b1r > 50, 1, 0)
 w2 = ifelse(b2r > 50, 1, 0)
 w3 = ifelse(b3r > 50, 1, 0)
@@ -1514,7 +1514,7 @@ repub_senate
 ```
 
 ## NC Senate - 2016 Election
-```{r echo = F, include = F}
+```{r echo = F}
 # estimate percentages across whole state
 
 M5 <- lmer(Republican.percentage ~ traveltime15_2010 + foreign_share2010 + singleparent_share2010 + frac_coll_plus2010 + poor_share2010 + rent_twobed2015 + ann_avg_job_growth_2004_2013 + share_white2010 + share_black2010 + share_hisp2010 + share_asian2010 +  (1|county), data = rep2018, control = lmerControl(optimizer ="Nelder_Mead"))
@@ -1551,7 +1551,7 @@ modified_counties %>%
 ```
 
 ## NC House of Representatives - 2016 Election
-```{r multi-level-model, echo = FALSE, include = F}
+```{r multi-level-model, echo = FALSE}
 
 
 # linear mixed model with random effect for county
@@ -1562,7 +1562,7 @@ coef(M2)
 ```
 
 
-```{r, echo = FALSE, include= F}
+```{r, echo = FALSE}
 PI <- predictInterval(merMod = M2, newdata = full_counties,
                         level = 0.95, n.sims = 1000,
                         stat = "median", type="linear.prediction",
