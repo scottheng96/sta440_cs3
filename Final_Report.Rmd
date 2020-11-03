@@ -23,29 +23,8 @@ In this report, we seek to model predicting the outcomes of several key races, s
 Considering the different predictions this study is aiming to make, we draw data from multiple sources. Our datasets include Fivethirtyeight senate polling data, Fivethirtyeight presidential polling data, North Carolina Voter Data from the North Carolina voter registration database and National Census Data. Based on the question, we will draw information on different datasets, which will be explained more thoroughly at each model further in the report.
 
 ```{r, include=FALSE}
-generic_ballot_polls <- read.csv("data/generic_ballot_polls.csv")
-governor_polls <- read.csv("data/governor_polls.csv")
-house_polls <- read.csv("data/house_polls.csv")
-pres_primary_avgs_2020 <- read.csv("data/pres_primary_avgs_2020.csv")
-president_approval_polls <- read.csv("data/president_approval_polls.csv")
-president_polls <- read.csv("data/president_polls.csv")
 presidential_poll_averages_2020 <- read.csv("data/presidential_poll_averages_2020.csv") # note Maine and Nebraska are counted several times due to split electoral votes in this dataset
 senate_polls <- read.csv("data/senate_polls.csv")
-
-economist_polls <- read.csv("data/2016_Economist_Polls.csv")
-state_update <- read.dta("data/state_level_update.dta")
-gay_marriage <- read.dta("data/gay_marriage_megapoll.dta")
-
-cces <- readRDS("data/cumulative_2006-2019.Rds")
-
-census <- read.csv("data/cc-est2019-alldata-37.csv")
-
-gay_marriage <- read.dta("data/gay_marriage_megapoll.dta")
-
-parent_income <- read.csv("data/mrc_table12.csv")
-
-neighborhood_census <- read.csv("data/tract_covariates.csv")
-neighborhood_county <- read.csv("data/cty_covariates.csv")
 ```
 
 ```{r presidential-polls-by-state, include = FALSE}
