@@ -21,11 +21,17 @@ library(brms)
 Forecasting elections is of great interest, as politicians might use election outcome models to adjust campaign strategies, economists might use them to predict how markets will react, and citizens might use them to decide whether to vote. The 2020 election is one of great importance, and it has seemingly gained even more attention than past elections. 
 
 In this report, we seek to model predicting the outcomes of several key races. Specifically, we aim to predict and provide uncertainty predictions for the following:
+
 1. the outcome of the presidential election 
+
 2. whether the US Senate remains in Republican control
+
 3. the electoral college vote
+
 4. the outcomes of all NC Congressional elections (the 13 federal Representatives to Congress)
+
 5. the outcome of the NC Senate election
+
 
 First, we will provide background on the elections and our data. Then, we will describe our methods for all of the models, including a model of who votes in North Carolina, which aims to better the predictive power of our NC senate and House models. Next, we will discuss the results of our models. After that, we will walk through some of the limitations of our models. Finally, the appendices will include more detailed information about our modeling procedures and the data sources used. 
 
@@ -152,6 +158,8 @@ However, this does not tell the full picture, as the United States Presidential 
 p1
 ```
 
+
+
 ```{r, echo=FALSE, fig.height=4, fig.width=8}
 p2
 ```
@@ -194,11 +202,11 @@ For model validation, we plot traceplots for all the beta coefficients. From the
 
 On top of standard model validation tools, we also performed out-of sample validation by implementing the same model on 2016 data to predict the results of the Clinton-Trump When validating on 2016 election data, we predicted that Clinton had a 87.1% chance of winning. Clinton didn't end up winning the election, however many election prediction models forecasted that she would have a landslide victory. Thus, our model is seemingly consistent with what experts were predicting, which is another aspect of good model fit for the study. 
 
-<<<<<<< Updated upstream
+
 Sensitivity analysis was again conducted by changing the prior for $\mu_0$ in the model. We tried increasing and decreasing the variance of $\mu_0$, but had no impact on our prediction. We still got estimated probabilities of 0%. 
-=======
+
 We also plotted the beta estimates over time along with their credible intervals to see if the trend was a suitable fit within the intervals, but considering the extremeness of the predictions made by our model with respect to the electoral college, the relationship between out point estimates and their credible intervals had no meaningful interpretations in terms of sensitivity analysis.
->>>>>>> Stashed changes
+
 
 ## US Senate Model Results
 
@@ -616,6 +624,7 @@ left_join(beta_plot_data,poll_plot_data) %>%
   ylim(10, 90) + # TODO remove to show large uncertainty before first poll
   facet_wrap(~ state)
 ```
+
 ## 3. US Senate Model
 
 ### Model Purpose
