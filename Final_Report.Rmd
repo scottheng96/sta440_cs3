@@ -244,8 +244,8 @@ and \ \epsilon_{i} \sim N(0, \sigma^2)
 \end{aligned}$$
 
 where $i$ represents a given county. The republican share for a district $j$ is then calculated as 
-$Republican \ District_{j} = \sum_{i \in counties_j} t^*_i $
-where $counties_j$ is the set of counties in district $j$, and $t^*_i = \begin{cases} t_i && split_i \\ t_i / 2 && \lnot split_i \end{cases}$, where $t_i$ is the total number of voters in county $i$ and $split_i$ is a boolean of whether county $i$ is divided into two districts. Each split county was examined individually and looked geographically split in half for each district, so dividing the total by 2 is a reasonable approximation we can make with our given data. The Republican was considered to win the district if $Republican \ District_{j} > 0.5$.
+$$Republican \ District_{j} = \sum_{i \in counties_j} t^*_i $$
+where $counties_j$ is the set of counties in district $j$, and $t^*_i = \frac{t_i}{2 I(split_i)}$, where $t_i$ is the total number of voters in county $i$, $I$ is the indicator function, and $split_i$ is a boolean of whether county $i$ is divided into two districts. Each split county was examined individually and looked geographically split in half for each district, so dividing the total by 2 is a reasonable approximation we can make with our given data. The Republican was considered to win the district if $Republican \ District_{j} > 0.5$.
 
 ### Estimates From Model
 *print out prediction table*
@@ -268,7 +268,7 @@ where \ \alpha_{i} \sim N(\gamma_0, \tau^2)  \\
 and \ \epsilon_{i} \sim N(0, \sigma^2)
 \end{aligned}$$
 
-We calculated the overall Republican share for all districts simply as $Tillis = \sum_{j=1}^{13} Republican \ District_{j}$. Tillis was considered to win the election if $Tillis > 0.5$.
+We calculated the overall Republican share for all districts simply as $$Tillis = \sum_{j=1}^{13} Republican \ District_{j}$$. Tillis was considered to win the election if $Tillis > 0.5$.
 
 ### Estimates From Model
 *print out prediction table* 
