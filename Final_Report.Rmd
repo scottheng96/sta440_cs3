@@ -54,6 +54,15 @@ The purpose of this model is to predict the outcome of the presidential election
 ## US Senate Model
 *Describe Linzer model in more detail?*
 
+$$\begin{aligned}
+y_k \sim Binom(\pi_{i[k]j[k]},n_k) \\
+logit(\pi_{ij}) = \beta_{ij} + \delta_j \\
+for \ \ j > 1: \beta_{ij} \sim N(\beta_{i,j-1}, \sigma_{\beta}^2) \\
+\delta_j \sim N(\delta_{j-1},\sigma_{\delta}^2) \\
+for \ \ j = 1: \beta_{i1} \sim N(logit(h_i),s_i^2) \\
+\delta_1 = 0
+\end{aligned}$$
+
 Similar to our electoral college model, this model looks at senate race polling data from fivethirtyeight in order to predict the outcome of all current US senate races. The data was filtered to only include general election polling data, so in other words all jungle primary or runoff election polls were removed. Additionally, the data was filtered to only include polls less than a year out from the election. Lastly, polling data for third-parties was filtered out with one exception. Ricky Dale Harrington was an independent, but he was recoded to be a Democrat in our dataset. We did this because the few independents currently in Congress lately tend to vote with Democrats, and he was the only Independent in the dataset that was predicted to get a majority of votes in one of these senate races. After filtering, we were left with data for all states where senate elections were being held except for Arkansas, Rhode Island, South Dakota, West Virginia, Wyoming, Louisiana, and the second Georgia Race. However, most of these races were predicted to be blowout races, with Arkansas, South Dakota, West Virginia, Wyoming, and Louisiana deemed as safely Republican and Rhode Island deemed safe Democrat. Since this is the case, we counted these states as a corresponding Republican or Democratic win in each of our simulations. Georgia was the only race we were missing data for that seemed close, but we chose to use the Georgia predictions generated from the other Georgia race we did have data on, since senators are elected by the whole state and it is likely that the same people are voting for both senators. After making predictions for each individual race, we aggregate the results and look at the percentage of times where Republicans win more than 21 seats, where 21 is the number of seats Rebulicans need to win in order to have a 50/50 Republican/Democrat split in the senate. 
 
 *add Beta estimates/ JAGS output*
