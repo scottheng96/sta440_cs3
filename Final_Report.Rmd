@@ -281,9 +281,19 @@ and for any $j$ and $t=1$, we have
 $$\begin{aligned}
 \beta_{j, 1} \sim N(\mu_0, \sigma^2_0)
 \end{aligned}$$.
-We only consider polls ending 200 days or less before the election. We include polls from all 50 states.
+Moreover, we use priors 
+$$\begin{aligned}
+\nu_y \sim Un(0, 100) \\
+\tau_y \sim Un(0, 100) \\
+\nu_\beta \sim Un(0, 100) \\
+\tau_\beta \sim Un(0, 100) \\
+\mu_0 \sim N(50, 7.5) \\
+\sigma^2_0 \sim IG(0.5, 0.5)
+\end{aligned}$$.
 
-The Republican presidential candidate wins the electoral college for state $j$ if $w_j := \beta_{j,1} > 0.5$. The same candidate wins the election if 
+Since $\nu_y, \nu_\beta$ are degrees of freedom, we believe $Un(0, 100)$ are relatively uninformative. Similarly, since $\tau_y, \tau_\beta$ are the prior guess for the expected variance between states, we believe $Un(0, 100)$ are relatively uninformative. Additionally, we believe states (especially swing states) ought to have mean $\mu_0$ of 50\% on average and that 95\% of the time, $mu_0$ should be within 35 to 65\%. Finally, the variance prior for each state is given a high prior variance.
+
+We only consider polls ending 200 days or less before the election. We include polls from all 50 states. The Republican presidential candidate wins the electoral college for state $j$ if $w_j := \beta_{j,1} > 0.5$. The same candidate wins the election if 
 $$\sum_{j=1}^{50} w_j ec_j \geq 270$$, where $ec_j$ is the number of electoral votes for state $j$.
 
 ### Estimates From Model
