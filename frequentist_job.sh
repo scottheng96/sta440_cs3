@@ -8,4 +8,4 @@
 #SBATCH --mail-user=ajm120@duke.edu                                             
 
 module load RStan/2.19.2
-Rscript whovotes_bayesian_model_code.R
+Rscript whovotes_frequentist_model_code.R
