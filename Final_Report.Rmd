@@ -228,7 +228,7 @@ An additional model was created in order to better understand who votes in North
 We implemented a binomial mixed-effects model modeling the proportion of registered voter turnout using the aforementioned predictors as fixed effects, as well as random effects on the same predictors as well as an intercept to quantify heterogeneity across congressional districts. Using this model, we were able to understand the trends in voter turnout both across North Carolina broadly, and within competitive congressional districts. For more information about the model and analysis of its results, please consult our separate paper on Who Votes in North Carolina.
 
 
-# Additinal Discussion
+# Additional Discussion
 ## Limitations
 One common limitation across all models was the quality of the data. As polling data often has a disproportionate amount of observations for groups and variables, there will be a degree of uncertainty in our predictions as our sample size does not truly reflect the true opinions of people and certain demographics. There can be underrepresented or misrepresented groups of identities that can dramatically affect the effectiveness of the model.
 
